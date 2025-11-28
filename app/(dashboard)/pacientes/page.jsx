@@ -1,0 +1,127 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Search } from 'lucide-react';
+import Card, { CardContent } from '@/components/Card';
+import Badge from '@/components/Badge';
+import Button from '@/components/Button';
+import { allPatients } from '@/lib/mockData';
+
+export default function PacientesPage() {
+    const router = useRouter();
+    const [activeFilter, setActiveFilter] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filters = [
+        { id: 'all', label: 'Todos' },
+        { id: 'stable', label: 'Estable' },
+        { id: 'treatment', label: 'En tratamiento' },
+        { id: 'critical', label: 'Crítico' },
+    ];
+
+    // Filter by category
+    const categoryFiltered = activeFilter === 'all'
+        ? allPatients
+        : allPatients.filter(p => p.category === activeFilter);
+
+    // Filter by search query
+    const filteredPatients = categoryFiltered.filter(patient =>
+        patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        patient.role.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return (
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold text-clinical-gray-900">Pacientes</h1>
+                <p className="text-clinical-gray-600 mt-1">Gestión de pacientes y consultas</p>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-clinical-gray-400" size={20} />
+                <input
+                    type="text"
+                    placeholder="Buscar paciente por nombre o diagnóstico..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 border border-clinical-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-clinical-blue-500 focus:border-transparent transition-all"
+                />
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex gap-2 border-b border-clinical-gray-200">
+                {filters.map((filter) => (
+                    <button
+                        key={filter.id}
+                        onClick={() => setActiveFilter(filter.id)}
+                        className={`px-6 py-3 font-medium transition-all border-b-2 cursor-pointer ${activeFilter === filter.id
+                            ? 'border-clinical-blue-600 text-clinical-blue-600'
+                            : 'border-transparent text-clinical-gray-600 hover:text-clinical-gray-900'
+                            }`}
+                    >
+                        {filter.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Patient Cards */}
+            <div className="grid grid-cols-1 gap-4">
+                {filteredPatients.map((patient) => (
+                    <Card key={patient.id} hover>
+                        <CardContent className="py-4">
+                            <div className="flex items-center gap-4">
+                                {/* Avatar */}
+                                <div className="w-12 h-12 rounded-full bg-clinical-blue-100 flex items-center justify-center text-clinical-blue-700 font-semibold">
+                                    {patient.avatar}
+                                </div>
+
+                                {/* Patient Info */}
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-clinical-gray-900">{patient.name}</h3>
+                                    <p className="text-sm text-clinical-gray-600">{patient.role}</p>
+                                </div>
+
+                                {/* Status Badge */}
+                                <Badge variant={patient.status}>
+                                    {patient.status === 'critical' ? 'Crítico' : 'Estable'}
+                                </Badge>
+
+                                {/* Actions */}
+                                <div className="flex gap-2">
+                                    <Button variant="outline" onClick={() => { }}>
+                                        Ver Historial
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => {
+                                            try {
+                                                router.push(`/consulta/${patient.id}`);
+                                            } catch (err) {
+                                                window.location.href = `/consulta/${patient.id}`;
+                                            }
+                                        }}
+                                    >
+                                        Nueva Consulta
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+
+            {filteredPatients.length === 0 && (
+                <div className="text-center py-12">
+                    <p className="text-clinical-gray-500">
+                        {searchQuery
+                            ? `No se encontraron pacientes que coincidan con "${searchQuery}"`
+                            : 'No se encontraron pacientes en esta categoría'
+                        }
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+}

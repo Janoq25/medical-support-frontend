@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --color-clinical-blue-50: #eff6ff;
+  --color-clinical-blue-100: #dbeafe;
+  --color-clinical-blue-200: #bfdbfe;
+  --color-clinical-blue-300: #93c5fd;
+  --color-clinical-blue-400: #60a5fa;
+  --color-clinical-blue-500: #3b82f6;
+  --color-clinical-blue-600: #2563eb;
+  --color-clinical-blue-700: #1d4ed8;
+
+  --color-clinical-red-50: #fef2f2;
+  --color-clinical-red-100: #fee2e2;
+  --color-clinical-red-200: #fecaca;
+  --color-clinical-red-300: #fca5a5;
+  --color-clinical-red-400: #f87171;
+  --color-clinical-red-500: #ef4444;
+  --color-clinical-red-600: #dc2626;
+  --color-clinical-red-700: #b91c1c;
+
+  --color-clinical-green-50: #f0fdf4;
+  --color-clinical-green-100: #dcfce7;
+  --color-clinical-green-200: #bbf7d0;
+  --color-clinical-green-300: #86efac;
+  --color-clinical-green-400: #4ade80;
+  --color-clinical-green-500: #22c55e;
+  --color-clinical-green-600: #16a34a;
+  --color-clinical-green-700: #15803d;
+
+  --color-clinical-gray-50: #f9fafb;
+  --color-clinical-gray-100: #f3f4f6;
+  --color-clinical-gray-200: #e5e7eb;
+  --color-clinical-gray-300: #d1d5db;
+  --color-clinical-gray-400: #9ca3af;
+  --color-clinical-gray-500: #6b7280;
+  --color-clinical-gray-600: #4b5563;
+  --color-clinical-gray-700: #374151;
+  --color-clinical-gray-800: #1f2937;
+  --color-clinical-gray-900: #111827;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-clinical-gray-200;
+  }
+
+  body {
+    @apply bg-clinical-gray-50 text-clinical-gray-900 antialiased;
+  }
+}
