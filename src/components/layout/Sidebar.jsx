@@ -60,7 +60,7 @@ export default function Sidebar() {
                     <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-lg shadow-lg border border-clinical-gray-200 overflow-hidden">
                         <button
                             onClick={logout}
-                            className="flex items-center gap-3 px-4 py-3 w-full text-left text-clinical-red-600 hover:bg-clinical-red-50 transition-colors"
+                            className="flex items-center gap-3 px-4 py-3 w-full text-left text-clinical-red-600 hover:bg-clinical-red-50 transition-colors cursor-pointer"
                         >
                             <LogOut size={18} />
                             <span className="text-sm font-medium">Cerrar Sesión</span>

@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import Input from '@/components/Input';
-import Button from '@/components/Button';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
 
 export default function LoginForm() {
@@ -13,7 +13,7 @@ export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = (e) => {
         e.preventDefault();
 
         if (!email || !password) {
@@ -37,7 +37,7 @@ export default function LoginForm() {
                 label="ID de Doctor / Correo Electrónico"
                 type="email"
                 value={email}
-                onChange={(e: any) => {
+                onChange={(e) => {
                     setEmail(e.target.value);
                     setError('');
                 }}
@@ -50,7 +50,7 @@ export default function LoginForm() {
                     label="Contraseña"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
-                    onChange={(e: any) => {
+                    onChange={(e) => {
                         setPassword(e.target.value);
                         setError('');
                     }}

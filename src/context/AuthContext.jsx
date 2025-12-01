@@ -1,19 +1,12 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-interface AuthContextType {
-    user: string | null;
-    login: (email: string) => void;
-    logout: () => void;
-    isAuthenticated: boolean;
-}
+const AuthContext = createContext(undefined);
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<string | null>(null);
+export function AuthProvider({ children }) {
+    const [user, setUser] = useState(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -24,7 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    const login = (email: string) => {
+    const login = (email) => {
         setUser(email);
         localStorage.setItem('user', email);
         router.push('/dashboard');

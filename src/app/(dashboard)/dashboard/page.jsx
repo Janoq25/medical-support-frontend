@@ -1,10 +1,10 @@
 'use client';
 
-import Card, { CardHeader, CardContent, CardTitle } from '@/components/Card';
-import Badge from '@/components/Badge';
+import Card, { CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Users, FileText } from 'lucide-react';
-import { diagnosticsChartData, aiAssistanceChartData, recentPatients } from '@/lib/mockData';
+import { diagnosticsChartData, aiAssistanceChartData, recentPatients } from '@/services/mockData';
 
 export default function DashboardPage() {
     return (

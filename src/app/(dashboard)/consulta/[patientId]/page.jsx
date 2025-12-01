@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, use } from 'react';
-import Card, { CardHeader, CardContent, CardTitle } from '@/components/Card';
-import Button from '@/components/Button';
-import Input, { Textarea } from '@/components/Input';
+import Card, { CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Input, { Textarea } from '@/components/ui/Input';
 import { ChevronRight, Sparkles, Loader2, Copy, Check } from 'lucide-react';
-import { allPatients, mockIndicators } from '@/lib/mockData';
-import { requestAIOpinion } from '@/lib/aiSimulation';
+import { allPatients, mockIndicators } from '@/services/mockData';
+import { requestAIOpinion } from '@/services/aiSimulation';
 
 export default function ConsultaPage({ params }) {
     // Unwrap params using React.use() for Next.js 15+ compatibility

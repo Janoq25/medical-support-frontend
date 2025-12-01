@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
-import Card, { CardContent } from '@/components/Card';
-import Badge from '@/components/Badge';
-import Button from '@/components/Button';
-import { allPatients } from '@/lib/mockData';
+import Card, { CardContent } from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import { allPatients } from '@/services/mockData';
 
 export default function PacientesPage() {
     const router = useRouter();
@@ -90,7 +90,16 @@ export default function PacientesPage() {
 
                                 {/* Actions */}
                                 <div className="flex gap-2">
-                                    <Button variant="outline" onClick={() => { }}>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            try {
+                                                router.push(`/pacientes/${patient.id}/historial`);
+                                            } catch (err) {
+                                                window.location.href = `/pacientes/${patient.id}/historial`;
+                                            }
+                                        }}
+                                    >
                                         Ver Historial
                                     </Button>
                                     <Button

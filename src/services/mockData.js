@@ -23,6 +23,7 @@ export const recentPatients = [
     { id: 2, name: 'Joao Silva', role: 'Seguimiento', status: 'stable', avatar: 'JS' },
     { id: 3, name: 'María González', role: 'Evaluación inicial', status: 'stable', avatar: 'MG' },
     { id: 4, name: 'Carlos Mendoza', role: 'Paciente TCA', status: 'critical', avatar: 'CM' },
+    { id: 5, name: 'Ana Martínez', role: 'Evaluación inicial', status: 'stable', avatar: 'AM', category: 'stable' },
 ];
 
 export const allPatients = [
