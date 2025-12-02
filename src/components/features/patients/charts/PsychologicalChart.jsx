@@ -35,11 +35,11 @@ export default function PsychologicalChart({ current, previous }) {
     return (
         <div className="w-full h-80">
             <ResponsiveContainer width="100%" height="100%">
-                <RadarChart data={data}>
+                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
                     <PolarGrid stroke="#E5E7EB" />
                     <PolarAngleAxis
                         dataKey="indicator"
-                        tick={{ fill: '#6B7280', fontSize: 12 }}
+                        tick={{ fill: '#6B7280', fontSize: 11 }}
                     />
                     <PolarRadiusAxis
                         angle={90}

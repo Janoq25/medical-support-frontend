@@ -12,13 +12,16 @@ export default function BMIChart({ data }) {
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                     data={data}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 20 }}
                 >
                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                     <XAxis
                         dataKey="date"
                         stroke="#6B7280"
                         style={{ fontSize: '12px' }}
+                        angle={-45}
+                        textAnchor="end"
+                        height={60}
                     />
                     <YAxis
                         stroke="#6B7280"

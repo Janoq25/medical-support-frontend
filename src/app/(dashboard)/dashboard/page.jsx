@@ -22,17 +22,18 @@ export default function DashboardPage() {
                         <CardTitle>Diagnósticos Realizados</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[300px] w-full">
+                        <div className="h-[250px] lg:h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={diagnosticsChartData}>
+                                <LineChart data={diagnosticsChartData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                                    <XAxis dataKey="month" stroke="#6b7280" />
-                                    <YAxis stroke="#6b7280" />
+                                    <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickMargin={10} />
+                                    <YAxis stroke="#6b7280" fontSize={12} />
                                     <Tooltip
                                         contentStyle={{
                                             backgroundColor: 'white',
                                             border: '1px solid #e5e7eb',
-                                            borderRadius: '8px'
+                                            borderRadius: '8px',
+                                            fontSize: '12px'
                                         }}
                                     />
                                     <Line
@@ -84,20 +85,21 @@ export default function DashboardPage() {
                         <CardTitle>Asistencia por IA Exitosa</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[300px] w-full">
+                        <div className="h-[250px] lg:h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={aiAssistanceChartData}>
+                                <LineChart data={aiAssistanceChartData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                                    <XAxis dataKey="month" stroke="#6b7280" />
-                                    <YAxis stroke="#6b7280" />
+                                    <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickMargin={10} />
+                                    <YAxis stroke="#6b7280" fontSize={12} />
                                     <Tooltip
                                         contentStyle={{
                                             backgroundColor: 'white',
                                             border: '1px solid #e5e7eb',
-                                            borderRadius: '8px'
+                                            borderRadius: '8px',
+                                            fontSize: '12px'
                                         }}
                                     />
-                                    <Legend />
+                                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                                     <Line
                                         type="monotone"
                                         dataKey="gpt"

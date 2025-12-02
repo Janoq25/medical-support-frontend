@@ -51,12 +51,12 @@ export default function PacientesPage() {
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex gap-2 border-b border-clinical-gray-200">
+            <div className="flex gap-2 border-b border-clinical-gray-200 overflow-x-auto pb-1">
                 {filters.map((filter) => (
                     <button
                         key={filter.id}
                         onClick={() => setActiveFilter(filter.id)}
-                        className={`px-6 py-3 font-medium transition-all border-b-2 cursor-pointer ${activeFilter === filter.id
+                        className={`px-6 py-3 font-medium transition-all border-b-2 cursor-pointer whitespace-nowrap ${activeFilter === filter.id
                             ? 'border-clinical-blue-600 text-clinical-blue-600'
                             : 'border-transparent text-clinical-gray-600 hover:text-clinical-gray-900'
                             }`}
@@ -71,27 +71,30 @@ export default function PacientesPage() {
                 {filteredPatients.map((patient) => (
                     <Card key={patient.id} hover>
                         <CardContent className="py-4">
-                            <div className="flex items-center gap-4">
+                            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                                 {/* Avatar */}
-                                <div className="w-12 h-12 rounded-full bg-clinical-blue-100 flex items-center justify-center text-clinical-blue-700 font-semibold">
+                                <div className="w-12 h-12 rounded-full bg-clinical-blue-100 flex items-center justify-center text-clinical-blue-700 font-semibold shrink-0">
                                     {patient.avatar}
                                 </div>
 
                                 {/* Patient Info */}
-                                <div className="flex-1">
+                                <div className="flex-1 w-full md:w-auto">
                                     <h3 className="font-semibold text-clinical-gray-900">{patient.name}</h3>
                                     <p className="text-sm text-clinical-gray-600">{patient.role}</p>
                                 </div>
 
                                 {/* Status Badge */}
-                                <Badge variant={patient.status}>
-                                    {patient.status === 'critical' ? 'Crítico' : 'Estable'}
-                                </Badge>
+                                <div className="self-start md:self-center">
+                                    <Badge variant={patient.status}>
+                                        {patient.status === 'critical' ? 'Crítico' : 'Estable'}
+                                    </Badge>
+                                </div>
 
                                 {/* Actions */}
-                                <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto mt-2 md:mt-0">
                                     <Button
                                         variant="outline"
+                                        className="w-full sm:w-auto justify-center"
                                         onClick={() => {
                                             try {
                                                 router.push(`/pacientes/${patient.id}/historial`);
@@ -104,6 +107,7 @@ export default function PacientesPage() {
                                     </Button>
                                     <Button
                                         variant="primary"
+                                        className="w-full sm:w-auto justify-center"
                                         onClick={() => {
                                             try {
                                                 router.push(`/consulta/${patient.id}`);

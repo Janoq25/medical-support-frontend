@@ -36,9 +36,14 @@ export default function LoginPage() {
             </div>
 
             {/* Right Side - Login Form */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-clinical-gray-50">
+            <div className="flex-1 flex items-center justify-center p-4 md:p-8 bg-clinical-gray-50">
                 <div className="w-full max-w-md">
                     <div className="text-center mb-8">
+                        <div className="flex justify-center mb-6 lg:hidden">
+                            <div className="w-16 h-16 bg-clinical-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                <Activity className="w-8 h-8 text-white" />
+                            </div>
+                        </div>
                         <h1 className="text-3xl font-bold text-clinical-gray-900 mb-2">
                             Erwin&apos;s Hospital
                         </h1>

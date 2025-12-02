@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Activity, TrendingUp, Brain } from 'lucide-react';
+import { ArrowLeft, Calendar, Activity, TrendingUp, Brain, Eye } from 'lucide-react';
 import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -40,8 +40,8 @@ export default function PatientHistoryPage({ params }) {
 
             {/* Patient Header Card */}
             <Card>
-                <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
+                <CardContent className="p-4 md:p-6">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                         <div className="flex items-center gap-6">
                             {/* Large Avatar */}
                             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-clinical-blue-500 to-clinical-blue-700 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
@@ -78,14 +78,16 @@ export default function PatientHistoryPage({ params }) {
                         </div>
 
                         {/* Action Button */}
-                        <Button
-                            variant="primary"
-                            onClick={handleNewConsultation}
-                            className="px-6 py-3 shadow-lg hover:shadow-xl transition-shadow"
-                        >
-                            <Activity size={20} className="mr-2" />
-                            Iniciar Nueva Consulta
-                        </Button>
+                        <div className="w-full md:w-auto mt-4 md:mt-0">
+                            <Button
+                                variant="primary"
+                                onClick={handleNewConsultation}
+                                className="w-full md:w-auto px-6 py-3 shadow-lg hover:shadow-xl transition-shadow flex justify-center"
+                            >
+                                <Activity size={20} className="mr-2" />
+                                Iniciar Nueva Consulta
+                            </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -94,7 +96,7 @@ export default function PatientHistoryPage({ params }) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* BMI Evolution Chart */}
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent className="p-4 md:p-6">
                         <div className="flex items-center gap-2 mb-4">
                             <TrendingUp className="text-clinical-blue-600" size={24} />
                             <h2 className="text-xl font-bold text-clinical-gray-900">Evolución del IMC</h2>
@@ -105,7 +107,7 @@ export default function PatientHistoryPage({ params }) {
 
                 {/* Psychological Indicators Chart */}
                 <Card>
-                    <CardContent className="p-6">
+                    <CardContent className="p-4 md:p-6">
                         <div className="flex items-center gap-2 mb-4">
                             <Brain className="text-clinical-blue-600" size={24} />
                             <h2 className="text-xl font-bold text-clinical-gray-900">Indicadores Psicológicos</h2>
@@ -120,7 +122,7 @@ export default function PatientHistoryPage({ params }) {
 
             {/* Consultation History Timeline */}
             <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 md:p-6">
                     <div className="flex items-center gap-2 mb-6">
                         <Calendar className="text-clinical-blue-600" size={24} />
                         <h2 className="text-xl font-bold text-clinical-gray-900">Historial de Consultas</h2>
@@ -164,9 +166,14 @@ export default function PatientHistoryPage({ params }) {
                                                 <p className="text-sm text-clinical-gray-500">{consultation.notes}</p>
                                             </div>
 
-                                            <Button variant="outline" onClick={() => { }}>
-                                                Ver Detalles
-                                            </Button>
+                                            <div className="flex flex-col md:flex-row items-end md:items-center gap-2">
+                                                <Button variant="outline" onClick={() => { }} className="hidden md:flex">
+                                                    Ver Detalles
+                                                </Button>
+                                                <Button variant="outline" onClick={() => { }} className="md:hidden p-2">
+                                                    <Eye size={20} />
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
