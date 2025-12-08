@@ -57,3 +57,38 @@ export const mockIndicators = {
         exercise: 8,
     },
 };
+
+// Patient management functions
+export const checkDniExists = (dni) => {
+    return allPatients.some(patient => patient.dni === dni);
+};
+
+export const addPatient = (patientData) => {
+    // Check if DNI already exists
+    if (checkDniExists(patientData.dni)) {
+        throw new Error('Ya existe un paciente con este DNI');
+    }
+
+    // Generate new ID
+    const newId = Math.max(...allPatients.map(p => p.id), 0) + 1;
+
+    // Create avatar initials for backward compatibility
+    const avatar = `${patientData.name.charAt(0)}${patientData.lastname.charAt(0)}`.toUpperCase();
+
+    // Create new patient with all fields
+    const newPatient = {
+        id: newId,
+        name: `${patientData.name} ${patientData.lastname}`,
+        role: 'Evaluación inicial',
+        status: 'stable',
+        avatar: avatar,
+        category: 'stable',
+        // Backend entity fields
+        ...patientData,
+    };
+
+    // Add to patients array
+    allPatients.push(newPatient);
+
+    return newPatient;
+};

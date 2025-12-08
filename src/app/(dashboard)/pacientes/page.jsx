@@ -33,9 +33,24 @@ export default function PacientesPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-clinical-gray-900">Pacientes</h1>
-                <p className="text-clinical-gray-600 mt-1">Gestión de pacientes y consultas</p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-clinical-gray-900">Pacientes</h1>
+                    <p className="text-clinical-gray-600 mt-1">Gestión de pacientes y consultas</p>
+                </div>
+                <Button
+                    variant="primary"
+                    onClick={() => {
+                        try {
+                            router.push('/pacientes/nuevo');
+                        } catch (err) {
+                            window.location.href = '/pacientes/nuevo';
+                        }
+                    }}
+                    className="w-full sm:w-auto"
+                >
+                    Nuevo Paciente
+                </Button>
             </div>
 
             {/* Search Bar */}
