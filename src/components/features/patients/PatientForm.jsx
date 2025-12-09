@@ -6,14 +6,14 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
 
-export default function PatientForm({ onSubmit, onCancel }) {
+export default function PatientForm({ onSubmit, onCancel, mode = 'create', initialData = null }) {
     const [formData, setFormData] = useState({
-        name: '',
-        lastname: '',
-        dni: '',
-        birthdate: '',
-        gender: true, // true = Masculino, false = Femenino
-        phone: '',
+        name: initialData?.name?.split(' ')[0] || '',
+        lastname: initialData?.lastname || initialData?.name?.split(' ').slice(1).join(' ') || '',
+        dni: initialData?.dni || '',
+        birthdate: initialData?.birthdate || '',
+        gender: initialData?.gender ?? true, // true = Masculino, false = Femenino
+        phone: initialData?.phone || '',
     });
 
     const [errors, setErrors] = useState({});
@@ -237,7 +237,10 @@ export default function PatientForm({ onSubmit, onCancel }) {
                             className="w-full sm:w-auto order-1 sm:order-2"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Guardando...' : 'Crear Paciente'}
+                            {isSubmitting
+                                ? (mode === 'edit' ? 'Actualizando...' : 'Guardando...')
+                                : (mode === 'edit' ? 'Actualizar Paciente' : 'Crear Paciente')
+                            }
                         </Button>
                     </div>
                 </CardContent>

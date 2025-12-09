@@ -2,16 +2,20 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, Pencil, Trash2 } from 'lucide-react';
 import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { allPatients } from '@/services/mockData';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { allPatients, deletePatient } from '@/services/mockData';
 
 export default function PacientesPage() {
     const router = useRouter();
     const [activeFilter, setActiveFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, patientId: null, patientName: '' });
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const filters = [
         { id: 'all', label: 'Todos' },
@@ -30,6 +34,35 @@ export default function PacientesPage() {
         patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         patient.role.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const handleDeleteClick = (patient) => {
+        setDeleteDialog({
+            isOpen: true,
+            patientId: patient.id,
+            patientName: patient.name,
+        });
+    };
+
+    const handleDeleteConfirm = async () => {
+        try {
+            setIsDeleting(true);
+            deletePatient(deleteDialog.patientId);
+            console.log('Paciente eliminado:', deleteDialog.patientId);
+
+            // Close dialog and refresh list
+            setDeleteDialog({ isOpen: false, patientId: null, patientName: '' });
+            setRefreshKey(prev => prev + 1);
+        } catch (error) {
+            console.error('Error deleting patient:', error);
+            alert('Error al eliminar el paciente: ' + error.message);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleDeleteCancel = () => {
+        setDeleteDialog({ isOpen: false, patientId: null, patientName: '' });
+    };
 
     return (
         <div className="space-y-6">
@@ -112,6 +145,28 @@ export default function PacientesPage() {
                                         className="w-full sm:w-auto justify-center"
                                         onClick={() => {
                                             try {
+                                                router.push(`/pacientes/${patient.id}/editar`);
+                                            } catch (err) {
+                                                window.location.href = `/pacientes/${patient.id}/editar`;
+                                            }
+                                        }}
+                                    >
+                                        <Pencil size={16} className="mr-2" />
+                                        Editar
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full sm:w-auto justify-center text-clinical-red-600 hover:bg-clinical-red-50 border-clinical-red-300"
+                                        onClick={() => handleDeleteClick(patient)}
+                                    >
+                                        <Trash2 size={16} className="mr-2" />
+                                        Eliminar
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full sm:w-auto justify-center"
+                                        onClick={() => {
+                                            try {
                                                 router.push(`/pacientes/${patient.id}/historial`);
                                             } catch (err) {
                                                 window.location.href = `/pacientes/${patient.id}/historial`;
@@ -150,6 +205,19 @@ export default function PacientesPage() {
                     </p>
                 </div>
             )}
+
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={deleteDialog.isOpen}
+                onClose={handleDeleteCancel}
+                onConfirm={handleDeleteConfirm}
+                title="Eliminar Paciente"
+                message={`¿Está seguro que desea eliminar al paciente "${deleteDialog.patientName}"? Esta acción no se puede deshacer.`}
+                confirmText="Eliminar"
+                cancelText="Cancelar"
+                variant="danger"
+                isLoading={isDeleting}
+            />
         </div>
     );
 }

@@ -59,8 +59,16 @@ export const mockIndicators = {
 };
 
 // Patient management functions
-export const checkDniExists = (dni) => {
-    return allPatients.some(patient => patient.dni === dni);
+export const checkDniExists = (dni, excludeId = null) => {
+    return allPatients.some(patient => patient.dni === dni && patient.id !== excludeId);
+};
+
+export const getPatientById = (id) => {
+    const patient = allPatients.find(p => p.id === parseInt(id));
+    if (!patient) {
+        throw new Error('Paciente no encontrado');
+    }
+    return patient;
 };
 
 export const addPatient = (patientData) => {
@@ -91,4 +99,46 @@ export const addPatient = (patientData) => {
     allPatients.push(newPatient);
 
     return newPatient;
+};
+
+export const updatePatient = (id, patientData) => {
+    const index = allPatients.findIndex(p => p.id === parseInt(id));
+
+    if (index === -1) {
+        throw new Error('Paciente no encontrado');
+    }
+
+    // Check if DNI already exists (excluding current patient)
+    if (checkDniExists(patientData.dni, parseInt(id))) {
+        throw new Error('Ya existe un paciente con este DNI');
+    }
+
+    // Create avatar initials
+    const avatar = `${patientData.name.charAt(0)}${patientData.lastname.charAt(0)}`.toUpperCase();
+
+    // Update patient with new data
+    const updatedPatient = {
+        ...allPatients[index],
+        name: `${patientData.name} ${patientData.lastname}`,
+        avatar: avatar,
+        // Backend entity fields
+        ...patientData,
+    };
+
+    allPatients[index] = updatedPatient;
+
+    return updatedPatient;
+};
+
+export const deletePatient = (id) => {
+    const index = allPatients.findIndex(p => p.id === parseInt(id));
+
+    if (index === -1) {
+        throw new Error('Paciente no encontrado');
+    }
+
+    // Remove patient from array
+    const deletedPatient = allPatients.splice(index, 1)[0];
+
+    return deletedPatient;
 };
