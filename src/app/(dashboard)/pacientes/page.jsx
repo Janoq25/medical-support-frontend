@@ -142,7 +142,7 @@ export default function PacientesPage() {
                                 <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto mt-2 md:mt-0">
                                     <Button
                                         variant="outline"
-                                        className="w-full sm:w-auto justify-center"
+                                        className="w-full sm:w-auto flex items-center justify-center"
                                         onClick={() => {
                                             try {
                                                 router.push(`/pacientes/${patient.id}/editar`);
@@ -156,7 +156,7 @@ export default function PacientesPage() {
                                     </Button>
                                     <Button
                                         variant="outline"
-                                        className="w-full sm:w-auto justify-center text-clinical-red-600 hover:bg-clinical-red-50 border-clinical-red-300"
+                                        className="w-full sm:w-auto flex items-center justify-center text-clinical-red-600 hover:bg-clinical-red-50 border-clinical-red-300"
                                         onClick={() => handleDeleteClick(patient)}
                                     >
                                         <Trash2 size={16} className="mr-2" />
@@ -164,7 +164,7 @@ export default function PacientesPage() {
                                     </Button>
                                     <Button
                                         variant="outline"
-                                        className="w-full sm:w-auto justify-center"
+                                        className="w-full sm:w-auto flex items-center justify-center"
                                         onClick={() => {
                                             try {
                                                 router.push(`/pacientes/${patient.id}/historial`);
@@ -177,7 +177,7 @@ export default function PacientesPage() {
                                     </Button>
                                     <Button
                                         variant="primary"
-                                        className="w-full sm:w-auto justify-center"
+                                        className="w-full sm:w-auto flex items-center justify-center"
                                         onClick={() => {
                                             try {
                                                 router.push(`/consulta/${patient.id}`);
