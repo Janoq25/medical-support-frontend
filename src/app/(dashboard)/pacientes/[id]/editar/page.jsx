@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import PatientForm from '@/components/features/patients/PatientForm';
-import { getPatientById, updatePatient } from '@/services/mockData';
+import { getPatient, updatePatient } from '@/services/patientApi';
 
 export default function EditarPacientePage() {
     const router = useRouter();
@@ -16,9 +16,15 @@ export default function EditarPacientePage() {
         const loadPatient = async () => {
             try {
                 setIsLoading(true);
-                // params.id is now available from useParams hook
-                const patientData = getPatientById(params.id);
-                setPatient(patientData);
+                const patientData = await getPatient(params.id);
+                // Normalizamos fecha a formato YYYY-MM-DD para el input date
+                const normalizedPatient = {
+                    ...patientData,
+                    birthdate: patientData.birthdate
+                        ? String(patientData.birthdate).split('T')[0]
+                        : '',
+                };
+                setPatient(normalizedPatient);
             } catch (err) {
                 console.error('Error loading patient:', err);
                 setError(err.message);
@@ -34,7 +40,7 @@ export default function EditarPacientePage() {
 
     const handleSubmit = async (patientData) => {
         try {
-            const updatedPatient = updatePatient(params.id, patientData);
+            const updatedPatient = await updatePatient(params.id, patientData);
             console.log('Paciente actualizado:', updatedPatient);
 
             // Redirect to patients list

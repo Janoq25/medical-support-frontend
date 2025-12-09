@@ -2,14 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import PatientForm from '@/components/features/patients/PatientForm';
-import { addPatient } from '@/services/mockData';
+import { createPatient } from '@/services/patientApi';
 
 export default function NuevoPacientePage() {
     const router = useRouter();
 
     const handleSubmit = async (patientData) => {
         try {
-            const newPatient = addPatient(patientData);
+            const newPatient = await createPatient(patientData);
             console.log('Paciente creado:', newPatient);
 
             // Redirect to patients list
