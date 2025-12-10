@@ -8,6 +8,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { getPatients, removePatient } from '@/services/patientApi';
+import { getLatestInquiryByPatient } from '@/services/inquiriesApi';
 
 export default function PacientesPage() {
     const router = useRouter();
@@ -21,8 +22,9 @@ export default function PacientesPage() {
 
     const filters = [
         { id: 'all', label: 'Todos' },
-        { id: 'male', label: 'Masculino' },
-        { id: 'female', label: 'Femenino' },
+        { id: 'stable', label: 'Estable' },
+        { id: 'in_treatment', label: 'En tratamiento' },
+        { id: 'critical', label: 'Crítico' },
     ];
 
     useEffect(() => {
@@ -30,7 +32,22 @@ export default function PacientesPage() {
             try {
                 setIsLoading(true);
                 const data = await getPatients();
-                setPatients(Array.isArray(data) ? data : []);
+                const patientList = Array.isArray(data) ? data : [];
+
+                // Traer el último inquiry de cada paciente para mostrar estado y diagnóstico
+                const withInquiry = await Promise.all(
+                    patientList.map(async (p) => {
+                        try {
+                            const latestInquiry = await getLatestInquiryByPatient(p.id);
+                            return { ...p, latestInquiry };
+                        } catch (inquiryErr) {
+                            console.warn('Inquiry fetch failed for patient', p.id, inquiryErr);
+                            return { ...p, latestInquiry: null };
+                        }
+                    })
+                );
+
+                setPatients(withInquiry);
                 setError(null);
             } catch (err) {
                 console.error('Error fetching patients:', err);
@@ -43,12 +60,13 @@ export default function PacientesPage() {
         fetchPatients();
     }, []);
 
-    const filteredByGender = activeFilter === 'all'
+    const filteredByStatus = activeFilter === 'all'
         ? patients
-        : patients.filter((p) => activeFilter === 'male' ? p.gender === true : p.gender === false);
+        : patients.filter((p) => (p.latestInquiry?.patient_state || 'stable') === activeFilter);
 
-    const filteredPatients = filteredByGender.filter(patient =>
+    const filteredPatients = filteredByStatus.filter(patient =>
         `${patient.name} ${patient.lastname}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (patient.latestInquiry?.diagnosis || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (patient.dni || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -107,7 +125,7 @@ export default function PacientesPage() {
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-clinical-gray-400" size={20} />
                 <input
                     type="text"
-                    placeholder="Buscar paciente por nombre o DNI..."
+                    placeholder="Buscar paciente por nombre o diagnóstico..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 border border-clinical-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-clinical-blue-500 focus:border-transparent transition-all"
@@ -152,7 +170,20 @@ export default function PacientesPage() {
                 {!isLoading && !error && filteredPatients.map((patient) => {
                     const initials = `${patient.name?.charAt(0) || ''}${patient.lastname?.charAt(0) || ''}`.toUpperCase();
                     const fullName = `${patient.name} ${patient.lastname}`.trim();
-                    const genderLabel = patient.gender === false ? 'Femenino' : 'Masculino';
+                    const latestState = patient.latestInquiry?.patient_state || 'stable';
+                    const diagnosis = patient.latestInquiry?.diagnosis || 'Sin diagnóstico';
+
+                    const badgeVariant = latestState === 'critical'
+                        ? 'critical'
+                        : latestState === 'in_treatment'
+                            ? 'warning'
+                            : 'stable';
+
+                    const badgeLabel = latestState === 'critical'
+                        ? 'Crítico'
+                        : latestState === 'in_treatment'
+                            ? 'En tratamiento'
+                            : 'Estable';
 
                     return (
                         <Card key={patient.id} hover>
@@ -166,14 +197,14 @@ export default function PacientesPage() {
                                     {/* Patient Info */}
                                     <div className="flex-1 w-full md:w-auto">
                                         <h3 className="font-semibold text-clinical-gray-900">{fullName || 'Paciente sin nombre'}</h3>
-                                        <p className="text-sm text-clinical-gray-600">DNI: {patient.dni || 'No registrado'}</p>
-                                        <p className="text-sm text-clinical-gray-600">Tel: {patient.phone || 'Sin telケfono'}</p>
+                                        <p className="text-sm text-clinical-gray-600">{diagnosis}</p>
+                                        <p className="text-xs text-clinical-gray-500 mt-1">DNI: {patient.dni || 'No registrado'} • Tel: {patient.phone || 'Sin teléfono'}</p>
                                     </div>
 
-                                    {/* Gender Badge */}
+                                    {/* Status Badge */}
                                     <div className="self-start md:self-center">
-                                        <Badge variant={patient.gender === false ? 'warning' : 'stable'}>
-                                            {genderLabel}
+                                        <Badge variant={badgeVariant}>
+                                            {badgeLabel}
                                         </Badge>
                                     </div>
 

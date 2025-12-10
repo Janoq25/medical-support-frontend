@@ -1,34 +1,65 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useEffect, useState, use } from 'react';
 import Card, { CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input, { Textarea } from '@/components/ui/Input';
-import { ChevronRight, Sparkles, Loader2, Copy, Check } from 'lucide-react';
-import { allPatients, mockIndicators } from '@/services/mockData';
+import { ChevronRight, Sparkles, Loader2, Copy, Check, Save } from 'lucide-react';
+import { mockIndicators } from '@/services/mockData';
 import { requestAIOpinion } from '@/services/aiSimulation';
+import { getPatient } from '@/services/patientApi';
+import { createInquiry } from '@/services/inquiriesApi';
 
 export default function ConsultaPage({ params }) {
-    // Unwrap params using React.use() for Next.js 15+ compatibility
     const resolvedParams = use(params);
-    const patient = allPatients.find(p => p.id === parseInt(resolvedParams.patientId)) || allPatients[0];
+    const patientId = resolvedParams.patientId;
+
+    const [patient, setPatient] = useState(null);
+    const [loadingPatient, setLoadingPatient] = useState(true);
+    const [patientError, setPatientError] = useState(null);
 
     const [indicators, setIndicators] = useState(mockIndicators);
     const [aiResponses, setAiResponses] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loadingAI, setLoadingAI] = useState(false);
+    const [saving, setSaving] = useState(false);
     const [diagnosis, setDiagnosis] = useState('');
     const [feedback, setFeedback] = useState('');
+    const [patientState, setPatientState] = useState('stable'); // stable | in_treatment | critical
     const [selectedModel, setSelectedModel] = useState(null);
     const [showPrompt, setShowPrompt] = useState({ gpt: false, deepseek: false });
+    const [saveError, setSaveError] = useState(null);
+    const [saveSuccess, setSaveSuccess] = useState(false);
+
+    useEffect(() => {
+        const fetchPatient = async () => {
+            try {
+                setLoadingPatient(true);
+                const data = await getPatient(patientId);
+                setPatient(data);
+                setPatientError(null);
+            } catch (err) {
+                console.error('Error fetching patient:', err);
+                setPatientError(err.message || 'No se pudo cargar el paciente');
+            } finally {
+                setLoadingPatient(false);
+            }
+        };
+
+        if (patientId) {
+            fetchPatient();
+        }
+    }, [patientId]);
 
     const handleRequestAI = async () => {
-        setLoading(true);
+        setLoadingAI(true);
         setAiResponses(null);
         setSelectedModel(null);
+        setSaveError(null);
+        setSaveSuccess(false);
 
         const responses = await requestAIOpinion(indicators);
         setAiResponses(responses);
-        setLoading(false);
+        setLoadingAI(false);
     };
 
     const handleSelectDiagnosis = (model, diagnosisText) => {
@@ -41,10 +72,75 @@ export default function ConsultaPage({ params }) {
             ...prev,
             [category]: {
                 ...prev[category],
-                [field]: parseFloat(value) || 0
-            }
+                [field]: parseFloat(value) || 0,
+            },
         }));
     };
+
+    const handleSaveInquiry = async () => {
+        try {
+            setSaving(true);
+            setSaveError(null);
+            setSaveSuccess(false);
+
+            if (!diagnosis.trim()) {
+                throw new Error('Ingrese un diagnóstico antes de guardar la consulta');
+            }
+
+            const type_diagnosis = selectedModel === 'gpt'
+                ? 'chatgpt'
+                : selectedModel === 'deepseek'
+                    ? 'deepseek'
+                    : 'normal';
+
+            const modelData = selectedModel && aiResponses ? aiResponses[selectedModel] : null;
+
+            const payload = {
+                patientId,
+                diagnosis,
+                patient_state: patientState,
+                type_diagnosis,
+                feedback,
+                risk_level: null,
+                ai_prompt: modelData?.prompt || null,
+                ai_response: modelData?.diagnosis || null,
+                ai_confidence: modelData?.confidence || null,
+                indicators: [], // Sin indicadores reales en backend aún
+            };
+
+            await createInquiry(payload);
+            setSaveSuccess(true);
+        } catch (err) {
+            console.error('Error saving inquiry:', err);
+            setSaveError(err.message || 'No se pudo guardar la consulta');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (loadingPatient) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-clinical-blue-600 mx-auto"></div>
+                    <p className="text-clinical-gray-600 mt-4">Cargando paciente...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (patientError || !patient) {
+        return (
+            <div className="space-y-4">
+                <h1 className="text-2xl font-bold text-clinical-gray-900">Consulta</h1>
+                <Card>
+                    <CardContent className="text-clinical-red-700">
+                        {patientError || 'Paciente no encontrado'}
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 max-w-[1600px]">
@@ -52,12 +148,26 @@ export default function ConsultaPage({ params }) {
             <div className="flex items-center gap-2 text-sm text-clinical-gray-600">
                 <span>Nueva Consulta</span>
                 <ChevronRight size={16} />
-                <span className="text-clinical-gray-900 font-medium">{patient.name}</span>
+                <span className="text-clinical-gray-900 font-medium">{patient.name} {patient.lastname}</span>
             </div>
 
-            <div>
-                <h1 className="text-3xl font-bold text-clinical-gray-900">Nueva Consulta</h1>
-                <p className="text-clinical-gray-600 mt-1">Paciente: {patient.name}</p>
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <div>
+                    <h1 className="text-3xl font-bold text-clinical-gray-900">Nueva Consulta</h1>
+                    <p className="text-clinical-gray-600 mt-1">Paciente: {patient.name} {patient.lastname}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <label className="text-sm text-clinical-gray-700">Estado del paciente</label>
+                    <select
+                        value={patientState}
+                        onChange={(e) => setPatientState(e.target.value)}
+                        className="border border-clinical-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-clinical-blue-500 focus:outline-none"
+                    >
+                        <option value="stable">Estable</option>
+                        <option value="in_treatment">En tratamiento</option>
+                        <option value="critical">Crítico</option>
+                    </select>
+                </div>
             </div>
 
             {/* Split Screen Layout */}
@@ -157,9 +267,9 @@ export default function ConsultaPage({ params }) {
                         variant="primary"
                         className="w-full py-4 text-lg flex items-center justify-center gap-2"
                         onClick={handleRequestAI}
-                        disabled={loading}
+                        disabled={loadingAI}
                     >
-                        {loading ? (
+                        {loadingAI ? (
                             <>
                                 <Loader2 className="animate-spin" size={20} />
                                 Consultando IA...
@@ -178,12 +288,6 @@ export default function ConsultaPage({ params }) {
                             <CardTitle>Diagnóstico Final</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <Input
-                                label="Avance de la enfermedad / Riesgo inicial"
-                                type="text"
-                                placeholder="Ej: Moderado, Alto riesgo..."
-                            />
-
                             <Textarea
                                 label="Diagnóstico"
                                 value={diagnosis}
@@ -192,12 +296,45 @@ export default function ConsultaPage({ params }) {
                                 placeholder="Escriba el diagnóstico final aquí o seleccione una respuesta de IA..."
                             />
 
+                            <div className="space-y-2">
+                                <label className="text-sm text-clinical-gray-700">Feedback / Notas</label>
+                                <Textarea
+                                    value={feedback}
+                                    onChange={(e) => setFeedback(e.target.value)}
+                                    rows={4}
+                                    placeholder="Observaciones, plan de acción, motivos de la selección..."
+                                />
+                            </div>
+
+                            {saveError && (
+                                <div className="bg-clinical-red-50 border border-clinical-red-200 text-clinical-red-700 px-4 py-3 rounded-lg text-sm">
+                                    {saveError}
+                                </div>
+                            )}
+                            {saveSuccess && (
+                                <div className="bg-clinical-green-50 border border-clinical-green-200 text-clinical-green-700 px-4 py-3 rounded-lg text-sm">
+                                    Consulta guardada correctamente.
+                                </div>
+                            )}
+
                             <div className="flex gap-3">
-                                <Button variant="success" className="flex-1">
-                                    Posee TCA
-                                </Button>
-                                <Button variant="outline" className="flex-1">
-                                    No posee TCA
+                                <Button
+                                    variant="primary"
+                                    className="flex-1 flex items-center justify-center gap-2"
+                                    onClick={handleSaveInquiry}
+                                    disabled={saving}
+                                >
+                                    {saving ? (
+                                        <>
+                                            <Loader2 className="animate-spin" size={16} />
+                                            Guardando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save size={16} />
+                                            Guardar Consulta
+                                        </>
+                                    )}
                                 </Button>
                             </div>
                         </CardContent>
@@ -206,9 +343,8 @@ export default function ConsultaPage({ params }) {
 
                 {/* RIGHT COLUMN - AI Responses */}
                 <div className="space-y-6">
-                    {loading && (
+                    {loadingAI && (
                         <div className="space-y-4">
-                            {/* Skeleton Loading */}
                             {[1, 2].map((i) => (
                                 <Card key={i} className="animate-pulse">
                                     <CardContent className="py-6">
@@ -224,7 +360,7 @@ export default function ConsultaPage({ params }) {
                         </div>
                     )}
 
-                    {aiResponses && !loading && (
+                    {aiResponses && !loadingAI && (
                         <>
                             {/* GPT Response */}
                             <Card
@@ -351,23 +487,20 @@ export default function ConsultaPage({ params }) {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <p className="text-sm text-clinical-gray-600">
-                                        Justifica por qué eligió {selectedModel === 'gpt' ? 'GPT' : selectedModel === 'deepseek' ? 'DeepSeek' : 'un modelo de IA'}
+                                        Justifica por qué elegiste {selectedModel === 'gpt' ? 'GPT' : selectedModel === 'deepseek' ? 'DeepSeek' : 'un modelo de IA'}
                                     </p>
                                     <Textarea
                                         value={feedback}
                                         onChange={(e) => setFeedback(e.target.value)}
                                         rows={4}
-                                        placeholder="Ej: Seleccioné DeepSeek porque proporcionó un análisis más detallado de los criterios DSM-5..."
+                                        placeholder="Ej: Seleccioné DeepSeek porque proporcionó un análisis más detallado..."
                                     />
-                                    <Button variant="primary" className="w-full">
-                                        Guardar Feedback
-                                    </Button>
                                 </CardContent>
                             </Card>
                         </>
                     )}
 
-                    {!aiResponses && !loading && (
+                    {!aiResponses && !loadingAI && (
                         <Card className="border-dashed">
                             <CardContent className="py-12 text-center">
                                 <Sparkles className="mx-auto text-clinical-gray-400 mb-4" size={48} />
