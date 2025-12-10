@@ -3,10 +3,42 @@
 import Card, { CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, Users, FileText } from 'lucide-react';
-import { diagnosticsChartData, aiAssistanceChartData, recentPatients } from '@/services/mockData';
+import { TrendingUp, TrendingDown, Users, FileText } from 'lucide-react';
+import { diagnosticsChartData, aiAssistanceChartData } from '@/services/mockData';
+import { getRecentPatients, getPatientMonthlyResume, getInquiryMonthlyResume } from '@/services/dashboardApi';
+import { useState, useEffect } from 'react';
+import { FullScreenLoader } from '@/components/ui/Loader';
 
 export default function DashboardPage() {
+    const [isLoading, setIsLoading] = useState(true);
+    const [recentPatients, setRecentPatients] = useState([]);
+    const [monthlyPatientResume, setMonthlyPatientResume] = useState({total: 0, previous: 0, changePercent: 0});
+    const [monthlyInquiryResume, setMonthlyInquiryResume] = useState({total: 0, previous: 0, changePercent: 0});
+
+    // Obtener toda la data para el dashboard
+    useEffect(() => {
+        const getDashboardData = async () => {
+            setIsLoading(true);
+            try {
+                const patientsData = await getRecentPatients();
+                setRecentPatients(patientsData);
+
+                const monthlyPatientData = await getPatientMonthlyResume();
+                setMonthlyPatientResume(monthlyPatientData);
+                
+                const monthlyInquiryData = await getInquiryMonthlyResume();
+                setMonthlyInquiryResume(monthlyInquiryData);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        getDashboardData();
+    }, []);
+
+    if(isLoading) {
+        return <FullScreenLoader />;
+    }
+
     return (
         <div className="space-y-6">
             <div>
@@ -55,21 +87,29 @@ export default function DashboardPage() {
                         <CardTitle>Últimos Pacientes</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {recentPatients.map((patient) => (
-                            <div key={patient.id} className="flex items-center gap-3">
+                        {recentPatients.map((patient, index) => (
+                            <div key={index} className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full bg-clinical-blue-100 flex items-center justify-center text-clinical-blue-700 font-semibold text-sm">
-                                    {patient.avatar}
+                                    {patient.initials}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-clinical-gray-900 truncate">
-                                        {patient.name}
+                                        {`${patient.name} ${patient.lastname}`}
                                     </p>
                                     <p className="text-xs text-clinical-gray-500 truncate">
-                                        {patient.role}
+                                        {patient.lastState === 'critical'
+                                            ? 'Paciente TCA'
+                                            : 'Seguimiento'}
                                     </p>
                                 </div>
-                                <Badge variant={patient.status}>
-                                    {patient.status === 'critical' ? 'Crítico' : 'Estable'}
+                                <Badge variant={patient.lastState === 'critical' ? 'critical' : 'stable'}>
+                                    {patient.lastState === 'critical'
+                                            ? 'Crítico'
+                                            : patient.lastState === 'stable'
+                                            ? 'Estable'
+                                            : patient.lastState === 'in_treatment'
+                                            ? 'En tratamiento'
+                                            : ''}
                                 </Badge>
                             </div>
                         ))}
@@ -129,17 +169,26 @@ export default function DashboardPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-clinical-gray-600">Pacientes</p>
-                                    <p className="text-3xl font-bold text-clinical-gray-900 mt-1">3,552</p>
+                                    <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyPatientResume.total}</p>
                                 </div>
                                 <div className="w-12 h-12 bg-clinical-blue-100 rounded-lg flex items-center justify-center">
                                     <Users className="text-clinical-blue-600" size={24} />
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1 mt-4">
+                            {monthlyPatientResume.changePercent > 0 ? (
+                                <div className="flex items-center gap-1 mt-4">
                                 <TrendingUp size={16} className="text-clinical-green-600" />
-                                <span className="text-sm text-clinical-green-600 font-medium">+12.5%</span>
+                                <span className="text-sm text-clinical-green-600 font-medium">{monthlyPatientResume.changePercent}%</span>
                                 <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
                             </div>
+                            ) : (
+                                <div className="flex items-center gap-1 mt-4">
+                                    <TrendingDown size={16} className="text-clinical-red-600" />
+                                    <span className="text-sm text-clinical-red-600 font-medium">{monthlyPatientResume.changePercent}%</span>
+                                    <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                                </div>
+                            )}
+                            
                         </CardContent>
                     </Card>
 
@@ -148,17 +197,25 @@ export default function DashboardPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm text-clinical-gray-600">Diagnósticos</p>
-                                    <p className="text-3xl font-bold text-clinical-gray-900 mt-1">5,321</p>
+                                    <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyInquiryResume.total}</p>
                                 </div>
                                 <div className="w-12 h-12 bg-clinical-green-100 rounded-lg flex items-center justify-center">
                                     <FileText className="text-clinical-green-600" size={24} />
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1 mt-4">
-                                <TrendingUp size={16} className="text-clinical-green-600" />
-                                <span className="text-sm text-clinical-green-600 font-medium">+8.2%</span>
-                                <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
-                            </div>
+                            {monthlyInquiryResume.changePercent > 0 ? (
+                                <div className="flex items-center gap-1 mt-4">
+                                    <TrendingUp size={16} className="text-clinical-green-600" />
+                                    <span className="text-sm text-clinical-green-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
+                                    <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-1 mt-4">
+                                    <TrendingDown size={16} className="text-clinical-red-600" />
+                                    <span className="text-sm text-clinical-red-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
+                                    <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
