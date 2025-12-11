@@ -27,36 +27,47 @@ const findRecentPatients = async () => {
 };
 
 export const getRecentPatients = async () => {
-    const data = await findRecentPatients();
-    const formatedData = data.map((dto) => ({
-        name: dto.patient.name,
-        lastname: dto.patient.lastname,
-        initials: getPatientInitials(dto.patient.name, dto.patient.lastname),
-        lastState: dto.lastState,
-    }));
-    return formatedData;
-}
+  const data = await findRecentPatients();
+  const formatedData = data.map((dto) => ({
+    name: dto.patient.name,
+    lastname: dto.patient.lastname,
+    initials: getPatientInitials(dto.patient.name, dto.patient.lastname),
+    lastState: dto.lastState,
+  }));
+  return formatedData;
+};
 
 export const getPatientMonthlyResume = async () => {
-  const response = await fetch(`${API_BASE_URL}/dashboard/monthly-patient-resume`, {
-    method: "GET",
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/monthly-patient-resume`,
+    {
+      method: "GET",
+      cache: "no-store",
+    }
+  );
   return handleResponse(response);
 };
 
 export const getInquiryMonthlyResume = async () => {
-  const response = await fetch(`${API_BASE_URL}/dashboard/monthly-inquiry-resume`, {
-    method: "GET",
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/monthly-inquiry-resume`,
+    {
+      method: "GET",
+      cache: "no-store",
+    }
+  );
   return handleResponse(response);
 };
 
-export const getInquiryMonthlyChart = async (year = new Date().getFullYear()) => {
-    const response = await fetch(`${API_BASE_URL}/dashboard/monthly-inquiry-chart?year=${year}`, {
-        method: "GET",
-        cache: "no-store",
-    });
-    return handleResponse(response);
-}
+export const getInquiryMonthlyChart = async (
+  year = new Date().getFullYear()
+) => {
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/monthly-inquiry-chart?year=${year}`,
+    {
+      method: "GET",
+      cache: "no-store",
+    }
+  );
+  return handleResponse(response);
+};

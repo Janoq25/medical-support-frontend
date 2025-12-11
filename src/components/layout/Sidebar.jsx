@@ -12,9 +12,9 @@ export default function Sidebar({ isOpen, onClose }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const navItems = [
-        { name: 'General', href: '/dashboard', icon: LayoutDashboard },
-        { name: 'Pacientes', href: '/pacientes', icon: Users },
-        { name: 'Indicadores', href: '/indicadores', icon: Activity },
+        { name: 'General', href: '/dashboard/home', icon: LayoutDashboard },
+        { name: 'Pacientes', href: '/dashboard/pacientes', icon: Users },
+        { name: 'Indicadores', href: '/dashboard/indicadores', icon: Activity },
     ];
 
     const isActive = (href) => pathname === href || pathname.startsWith(href + '/');
