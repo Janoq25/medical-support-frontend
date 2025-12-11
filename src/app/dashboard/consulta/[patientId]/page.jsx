@@ -5,7 +5,7 @@ import Card, { CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input, { Textarea } from '@/components/ui/Input';
 import { ChevronRight, Sparkles, Loader2, Copy, Check, Save } from 'lucide-react';
-import { mockIndicators } from '@/services/mockData';
+import { getIndicators } from '@/services/indicatorsApi';
 import { requestAIOpinion } from '@/services/aiSimulation';
 import { getPatient } from '@/services/patientApi';
 import { createInquiry } from '@/services/inquiriesApi';
@@ -18,7 +18,9 @@ export default function ConsultaPage({ params }) {
     const [loadingPatient, setLoadingPatient] = useState(true);
     const [patientError, setPatientError] = useState(null);
 
-    const [indicators, setIndicators] = useState(mockIndicators);
+    const [indicators, setIndicators] = useState([]);
+    const [indicatorValues, setIndicatorValues] = useState({});
+    const [loadingIndicators, setLoadingIndicators] = useState(true);
     const [aiResponses, setAiResponses] = useState(null);
     const [loadingAI, setLoadingAI] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -50,6 +52,28 @@ export default function ConsultaPage({ params }) {
         }
     }, [patientId]);
 
+    useEffect(() => {
+        const fetchIndicators = async () => {
+            try {
+                setLoadingIndicators(true);
+                const data = await getIndicators();
+                setIndicators(data);
+                // Initialize indicator values
+                const initialValues = {};
+                data.forEach(indicator => {
+                    initialValues[indicator.id] = indicator.minRegularValue || 0;
+                });
+                setIndicatorValues(initialValues);
+            } catch (err) {
+                console.error('Error fetching indicators:', err);
+            } finally {
+                setLoadingIndicators(false);
+            }
+        };
+
+        fetchIndicators();
+    }, []);
+
     const handleRequestAI = async () => {
         setLoadingAI(true);
         setAiResponses(null);
@@ -57,7 +81,11 @@ export default function ConsultaPage({ params }) {
         setSaveError(null);
         setSaveSuccess(false);
 
-        const responses = await requestAIOpinion(indicators);
+        const indicatorsData = indicators.map(ind => ({
+            ...ind,
+            value: indicatorValues[ind.id] || 0
+        }));
+        const responses = await requestAIOpinion(indicatorsData);
         setAiResponses(responses);
         setLoadingAI(false);
     };
@@ -67,13 +95,10 @@ export default function ConsultaPage({ params }) {
         setSelectedModel(model);
     };
 
-    const updateIndicator = (category, field, value) => {
-        setIndicators(prev => ({
+    const updateIndicatorValue = (indicatorId, value) => {
+        setIndicatorValues(prev => ({
             ...prev,
-            [category]: {
-                ...prev[category],
-                [field]: parseFloat(value) || 0,
-            },
+            [indicatorId]: parseFloat(value) || 0,
         }));
     };
 
@@ -180,85 +205,103 @@ export default function ConsultaPage({ params }) {
                             <CardTitle>Indicadores del Paciente</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-6">
-                            {/* Physical Indicators */}
-                            <div>
-                                <h4 className="font-semibold text-clinical-gray-900 mb-3">Indicadores Físicos</h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Input
-                                        label="IMC"
-                                        type="number"
-                                        step="0.1"
-                                        value={indicators.physical.imc}
-                                        onChange={(e) => updateIndicator('physical', 'imc', e.target.value)}
-                                    />
-                                    <Input
-                                        label="Peso (kg)"
-                                        type="number"
-                                        value={indicators.physical.weight}
-                                        onChange={(e) => updateIndicator('physical', 'weight', e.target.value)}
-                                    />
-                                    <Input
-                                        label="Altura (cm)"
-                                        type="number"
-                                        value={indicators.physical.height}
-                                        onChange={(e) => updateIndicator('physical', 'height', e.target.value)}
-                                    />
-                                    <Input
-                                        label="FC (lpm)"
-                                        type="number"
-                                        value={indicators.physical.heartRate}
-                                        onChange={(e) => updateIndicator('physical', 'heartRate', e.target.value)}
-                                    />
+                            {loadingIndicators ? (
+                                <div className="text-center py-8 text-clinical-gray-500">
+                                    Cargando indicadores...
                                 </div>
-                            </div>
-
-                            {/* Psychological Indicators */}
-                            <div>
-                                <h4 className="font-semibold text-clinical-gray-900 mb-3">Indicadores Psicológicos</h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {Object.entries(indicators.psychological).map(([key, value]) => (
-                                        <div key={key}>
-                                            <Input
-                                                label={key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
-                                                type="range"
-                                                min="0"
-                                                max="10"
-                                                value={value}
-                                                onChange={(e) => updateIndicator('psychological', key, e.target.value)}
-                                            />
-                                            <div className="flex justify-between text-xs text-clinical-gray-500 mt-1">
-                                                <span>0</span>
-                                                <span className="font-medium text-clinical-blue-600">{value}/10</span>
-                                                <span>10</span>
-                                            </div>
+                            ) : (
+                                <>
+                                    {/* Indicadores Físicos */}
+                                    <div>
+                                        <h4 className="font-semibold text-clinical-gray-900 mb-3">Indicadores Físicos</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {indicators.filter(ind => ind.type === 'fisico').map((indicator) => (
+                                                <div key={indicator.id}>
+                                                    <Input
+                                                        label={indicator.name}
+                                                        type="number"
+                                                        step={indicator.inputType === 'percentage' ? '0.01' : '0.1'}
+                                                        value={indicatorValues[indicator.id] || 0}
+                                                        onChange={(e) => updateIndicatorValue(indicator.id, e.target.value)}
+                                                    />
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
+                                    </div>
 
-                            {/* Behavioral Indicators */}
-                            <div>
-                                <h4 className="font-semibold text-clinical-gray-900 mb-3">Indicadores Conductuales</h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {Object.entries(indicators.behavioral).map(([key, value]) => (
-                                        <div key={key}>
-                                            <Input
-                                                label={key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
-                                                type="range"
-                                                min="0"
-                                                max="10"
-                                                value={value}
-                                                onChange={(e) => updateIndicator('behavioral', key, e.target.value)}
-                                            />
-                                            <div className="flex justify-between text-xs text-clinical-gray-500 mt-1">
-                                                <span>0</span>
-                                                <span className="font-medium text-clinical-blue-600">{value}/10</span>
-                                                <span>10</span>
-                                            </div>
+                                    {/* Indicadores Psicológicos */}
+                                    <div>
+                                        <h4 className="font-semibold text-clinical-gray-900 mb-3">Indicadores Psicológicos</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {indicators.filter(ind => ind.type === 'psicologico').map((indicator) => (
+                                                <div key={indicator.id}>
+                                                    <label className="text-sm font-medium text-clinical-gray-700 mb-2 block">
+                                                        {indicator.name.replace(' (0–10)', '')}
+                                                    </label>
+                                                    <input
+                                                        type="range"
+                                                        min="0"
+                                                        max="10"
+                                                        step="0.1"
+                                                        value={indicatorValues[indicator.id] || 0}
+                                                        onChange={(e) => updateIndicatorValue(indicator.id, e.target.value)}
+                                                        className="w-full h-2 bg-clinical-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                    />
+                                                    <div className="flex justify-between text-xs text-clinical-gray-500 mt-1">
+                                                        <span>0</span>
+                                                        <span className="font-medium text-clinical-blue-600">
+                                                            {(indicatorValues[indicator.id] || 0).toFixed(1)}/10
+                                                        </span>
+                                                        <span>10</span>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
+                                    </div>
+
+                                    {/* Indicadores Conductuales */}
+                                    <div>
+                                        <h4 className="font-semibold text-clinical-gray-900 mb-3">Indicadores Conductuales</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {indicators.filter(ind => ind.type === 'conductual').map((indicator) => (
+                                                <div key={indicator.id}>
+                                                    {indicator.inputType === 'scale_0_10' ? (
+                                                        <>
+                                                            <label className="text-sm font-medium text-clinical-gray-700 mb-2 block">
+                                                                {indicator.name.replace(' (0–10)', '')}
+                                                            </label>
+                                                            <input
+                                                                type="range"
+                                                                min="0"
+                                                                max="10"
+                                                                step="0.1"
+                                                                value={indicatorValues[indicator.id] || 0}
+                                                                onChange={(e) => updateIndicatorValue(indicator.id, e.target.value)}
+                                                                className="w-full h-2 bg-clinical-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                            />
+                                                            <div className="flex justify-between text-xs text-clinical-gray-500 mt-1">
+                                                                <span>0</span>
+                                                                <span className="font-medium text-clinical-blue-600">
+                                                                    {(indicatorValues[indicator.id] || 0).toFixed(1)}/10
+                                                                </span>
+                                                                <span>10</span>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <Input
+                                                            label={indicator.name}
+                                                            type="number"
+                                                            step="0.1"
+                                                            value={indicatorValues[indicator.id] || 0}
+                                                            onChange={(e) => updateIndicatorValue(indicator.id, e.target.value)}
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </CardContent>
                     </Card>
 
