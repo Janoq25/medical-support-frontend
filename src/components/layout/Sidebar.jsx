@@ -8,7 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar({ isOpen, onClose }) {
     const pathname = usePathname();
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const navItems = [
@@ -87,7 +87,7 @@ export default function Sidebar({ isOpen, onClose }) {
                         <User size={18} />
                     </div>
                     <div className="text-left flex-1 min-w-0">
-                        <p className="text-sm font-medium text-clinical-gray-900 truncate">Dr. Usuario</p>
+                        <p className="text-sm font-medium text-clinical-gray-900 truncate">{user || 'Dr. Usuario'}</p>
                         <p className="text-xs text-clinical-gray-500 truncate">Médico Especialista</p>
                     </div>
                     <ChevronUp size={16} className={`text-clinical-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
