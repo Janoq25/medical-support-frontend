@@ -4,6 +4,7 @@ import { useEffect, useState, use } from "react";
 import Card, { CardHeader, CardContent, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input, { Textarea } from "@/components/ui/Input";
+import OptionsGroup from "@/components/ui/OptionsGroup";
 import {
   ChevronRight,
   Sparkles,
@@ -434,7 +435,7 @@ export default function ConsultaPage({ params }) {
                               type="range"
                               min="0"
                               max="10"
-                              step="0.1"
+                              step="1"
                               value={indicatorValues[indicator.id] || 0}
                               onChange={(e) =>
                                 updateIndicatorValue(
@@ -478,8 +479,8 @@ export default function ConsultaPage({ params }) {
                                   type="range"
                                   min="0"
                                   max="10"
-                                  step="0.1"
-                                  value={indicatorValues[indicator.id] || 0}
+                                  step="1"
+                                  valueplaceholder={indicatorValues[indicator.id] || 0}
                                   onChange={(e) =>
                                     updateIndicatorValue(
                                       indicator.id,
@@ -503,8 +504,8 @@ export default function ConsultaPage({ params }) {
                               <Input
                                 label={indicator.name}
                                 type="number"
-                                step="0.1"
-                                value={indicatorValues[indicator.id] || 0}
+                                step="1"
+                                placeholder={indicatorValues[indicator.id] || 0}
                                 onChange={(e) =>
                                   updateIndicatorValue(
                                     indicator.id,
@@ -569,10 +570,10 @@ export default function ConsultaPage({ params }) {
               </div>
 
               <div className="flex items-center gap-3">
-                <label className="text-sm text-clinical-gray-700">
+                 {/* <label className="">
                   Estado del paciente
-                </label>
-                <select
+                </label>  */}
+                {/* <select
                   value={patientState}
                   onChange={(e) => setPatientState(e.target.value)}
                   className="border border-clinical-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-clinical-blue-500 focus:outline-none"
@@ -580,7 +581,17 @@ export default function ConsultaPage({ params }) {
                   <option value="stable">Estable</option>
                   <option value="in_treatment">En tratamiento</option>
                   <option value="critical">Crítico</option>
-                </select>
+                </select> */}
+                <OptionsGroup
+                  options={[
+                    { value: "stable", label: "Estable" },
+                    { value: "in_treatment", label: "En tratamiento" },
+                    { value: "critical", label: "Crítico" },
+                  ]}
+                  defaultValue={patientState}
+                  onSelect={setPatientState}
+                  label="Estado del paciente"
+                />
               </div>
 
               {saveError && (
