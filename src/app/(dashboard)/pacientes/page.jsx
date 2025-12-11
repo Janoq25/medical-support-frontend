@@ -103,7 +103,7 @@ export default function PacientesPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-clinical-gray-900">Pacientes</h1>
-                    <p className="text-clinical-gray-600 mt-1">GestiИn de pacientes y consultas</p>
+                    <p className="text-clinical-gray-600 mt-1">Gestión de pacientes y consultas</p>
                 </div>
                 <Button
                     variant="primary"
