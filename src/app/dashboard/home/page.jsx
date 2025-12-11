@@ -7,37 +7,51 @@ import { TrendingUp, TrendingDown, Users, FileText } from 'lucide-react';
 import { diagnosticsChartData, aiAssistanceChartData } from '@/services/mockData';
 import { getRecentPatients, getPatientMonthlyResume, getInquiryMonthlyResume, getInquiryMonthlyChart } from '@/services/dashboardApi';
 import { useState, useEffect } from 'react';
-import { FullScreenLoader } from '@/components/ui/Loader';
 
 export default function DashboardPage() {
-    const [isLoading, setIsLoading] = useState(true);
     const [recentPatients, setRecentPatients] = useState([]);
     const [monthlyPatientResume, setMonthlyPatientResume] = useState({total: 0, previous: 0, changePercent: 0});
     const [monthlyInquiryResume, setMonthlyInquiryResume] = useState({total: 0, previous: 0, changePercent: 0});
     const [monthlyInquiryChart, setMonthlyInquiryChart] = useState([]);
     const [isChartLoading, setIsChartLoading] = useState(false);
+    const [isRecentLoading, setIsRecentLoading] = useState(true);
+    const [isMonthlyPatientLoading, setIsMonthlyPatientLoading] = useState(true);
+    const [isMonthlyInquiryLoading, setIsMonthlyInquiryLoading] = useState(true);
+    const [recentVisible, setRecentVisible] = useState(false);
+    const [recentRevealCount, setRecentRevealCount] = useState(0);
+    const [monthlyPatientVisible, setMonthlyPatientVisible] = useState(false);
+    const [monthlyInquiryVisible, setMonthlyInquiryVisible] = useState(false);
     const currentYear = new Date().getFullYear();
     const [selectedYear, setSelectedYear] = useState(currentYear);
     const years = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4];
 
-    // Obtener toda la data para el dashboard
+    // Obtener toda la data para el dashboard (por sección)
     useEffect(() => {
         const getDashboardData = async () => {
-            setIsLoading(true);
             try {
+                setIsRecentLoading(true);
                 const patientsData = await getRecentPatients();
                 setRecentPatients(patientsData);
+            } finally {
+                setIsRecentLoading(false);
+            }
 
+            try {
+                setIsMonthlyPatientLoading(true);
                 const monthlyPatientData = await getPatientMonthlyResume();
                 setMonthlyPatientResume(monthlyPatientData);
-                
+            } finally {
+                setIsMonthlyPatientLoading(false);
+            }
+
+            try {
+                setIsMonthlyInquiryLoading(true);
                 const monthlyInquiryData = await getInquiryMonthlyResume();
                 setMonthlyInquiryResume(monthlyInquiryData);
-
             } finally {
-                setIsLoading(false);
+                setIsMonthlyInquiryLoading(false);
             }
-        }
+        };
         getDashboardData();
     }, []);
 
@@ -56,9 +70,42 @@ export default function DashboardPage() {
         return () => { active = false };
     }, [selectedYear]);
 
-    if(isLoading) {
-        return <FullScreenLoader />;
-    }
+    useEffect(() => {
+        if (!isRecentLoading) {
+            setRecentVisible(false);
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => setRecentVisible(true));
+            });
+
+            setRecentRevealCount(0);
+            let i = 0;
+            const intervalId = setInterval(() => {
+                i += 1;
+                setRecentRevealCount(i);
+                if (i >= recentPatients.length) {
+                    clearInterval(intervalId);
+                }
+            }, 100);
+            return () => clearInterval(intervalId);
+        } else {
+            setRecentVisible(false);
+            setRecentRevealCount(0);
+        }
+    }, [isRecentLoading, recentPatients]);
+
+    useEffect(() => {
+        if (!isMonthlyPatientLoading) {
+            setMonthlyPatientVisible(false);
+            setTimeout(() => setMonthlyPatientVisible(true), 0);
+        }
+    }, [isMonthlyPatientLoading]);
+
+    useEffect(() => {
+        if (!isMonthlyInquiryLoading) {
+            setMonthlyInquiryVisible(false);
+            setTimeout(() => setMonthlyInquiryVisible(true), 0);
+        }
+    }, [isMonthlyInquiryLoading]);
 
     return (
         <div className="space-y-6">
@@ -125,33 +172,50 @@ export default function DashboardPage() {
                     <CardHeader>
                         <CardTitle>Últimos Pacientes</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        {recentPatients.map((patient, index) => (
-                            <div key={index} className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-clinical-blue-100 flex items-center justify-center text-clinical-blue-700 font-semibold text-sm">
-                                    {patient.initials}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-clinical-gray-900 truncate">
-                                        {`${patient.name} ${patient.lastname}`}
-                                    </p>
-                                    <p className="text-xs text-clinical-gray-500 truncate">
-                                        {patient.lastState === 'critical'
-                                            ? 'Paciente TCA'
-                                            : 'Seguimiento'}
-                                    </p>
-                                </div>
-                                <Badge variant={patient.lastState === 'critical' ? 'critical' : 'stable'}>
-                                    {patient.lastState === 'critical'
-                                            ? 'Crítico'
-                                            : patient.lastState === 'stable'
-                                            ? 'Estable'
-                                            : patient.lastState === 'in_treatment'
-                                            ? 'En tratamiento'
-                                            : ''}
-                                </Badge>
+                    <CardContent>
+                        {isRecentLoading ? (
+                            <div className="space-y-4">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="flex items-center gap-3 animate-pulse">
+                                        <div className="w-10 h-10 rounded-full bg-clinical-gray-200" />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="h-4 w-1/3 bg-clinical-gray-200 rounded mb-2" />
+                                            <div className="h-3 w-1/4 bg-clinical-gray-200 rounded" />
+                                        </div>
+                                        <div className="h-6 w-20 bg-clinical-gray-200 rounded" />
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        ) : (
+                            <div className={`space-y-4 transition-opacity duration-700 ${recentVisible ? 'opacity-100' : 'opacity-0'}`}>
+                                {recentPatients.map((patient, index) => (
+                                    <div key={index} className={`flex items-center gap-3 transition-all duration-700 ease-out ${index < recentRevealCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
+                                        <div className="w-10 h-10 rounded-full bg-clinical-blue-100 flex items-center justify-center text-clinical-blue-700 font-semibold text-sm">
+                                            {patient.initials}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-clinical-gray-900 truncate">
+                                                {`${patient.name} ${patient.lastname}`}
+                                            </p>
+                                            <p className="text-xs text-clinical-gray-500 truncate">
+                                                {patient.lastState === 'critical'
+                                                    ? 'Paciente TCA'
+                                                    : 'Seguimiento'}
+                                            </p>
+                                        </div>
+                                        <Badge variant={patient.lastState === 'critical' ? 'critical' : 'stable'}>
+                                            {patient.lastState === 'critical'
+                                                    ? 'Crítico'
+                                                    : patient.lastState === 'stable'
+                                                    ? 'Estable'
+                                                    : patient.lastState === 'in_treatment'
+                                                    ? 'En tratamiento'
+                                                    : ''}
+                                        </Badge>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
@@ -205,54 +269,83 @@ export default function DashboardPage() {
                 <div className="space-y-6">
                     <Card>
                         <CardContent className="pt-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-clinical-gray-600">Pacientes</p>
-                                    <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyPatientResume.total}</p>
+                            {isMonthlyPatientLoading ? (
+                                <div className="animate-pulse">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="h-4 w-24 bg-clinical-gray-200 rounded" />
+                                            <div className="h-8 w-20 bg-clinical-gray-200 rounded mt-2" />
+                                        </div>
+                                        <div className="w-12 h-12 bg-clinical-gray-200 rounded-lg" />
+                                    </div>
+                                    <div className="h-3 w-40 bg-clinical-gray-200 rounded mt-4" />
                                 </div>
-                                <div className="w-12 h-12 bg-clinical-blue-100 rounded-lg flex items-center justify-center">
-                                    <Users className="text-clinical-blue-600" size={24} />
-                                </div>
-                            </div>
-                            {monthlyPatientResume.changePercent > 0 ? (
-                                <div className="flex items-center gap-1 mt-4">
-                                <TrendingUp size={16} className="text-clinical-green-600" />
-                                <span className="text-sm text-clinical-green-600 font-medium">{monthlyPatientResume.changePercent}%</span>
-                                <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
-                            </div>
                             ) : (
-                                <div className="flex items-center gap-1 mt-4">
-                                    <TrendingDown size={16} className="text-clinical-red-600" />
-                                    <span className="text-sm text-clinical-red-600 font-medium">{monthlyPatientResume.changePercent}%</span>
-                                    <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                                <div className={`transition-opacity duration-700 ${monthlyPatientVisible ? 'opacity-100' : 'opacity-0'}`}>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-clinical-gray-600">Pacientes</p>
+                                            <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyPatientResume.total}</p>
+                                        </div>
+                                        <div className="w-12 h-12 bg-clinical-blue-100 rounded-lg flex items-center justify-center">
+                                            <Users className="text-clinical-blue-600" size={24} />
+                                        </div>
+                                    </div>
+                                    {monthlyPatientResume.changePercent > 0 ? (
+                                        <div className="flex items-center gap-1 mt-4">
+                                        <TrendingUp size={16} className="text-clinical-green-600" />
+                                        <span className="text-sm text-clinical-green-600 font-medium">{monthlyPatientResume.changePercent}%</span>
+                                        <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                                    </div>
+                                    ) : (
+                                        <div className="flex items-center gap-1 mt-4">
+                                            <TrendingDown size={16} className="text-clinical-red-600" />
+                                            <span className="text-sm text-clinical-red-600 font-medium">{monthlyPatientResume.changePercent}%</span>
+                                            <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                            
                         </CardContent>
                     </Card>
 
                     <Card>
                         <CardContent className="pt-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-clinical-gray-600">Diagnósticos</p>
-                                    <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyInquiryResume.total}</p>
-                                </div>
-                                <div className="w-12 h-12 bg-clinical-green-100 rounded-lg flex items-center justify-center">
-                                    <FileText className="text-clinical-green-600" size={24} />
-                                </div>
-                            </div>
-                            {monthlyInquiryResume.changePercent > 0 ? (
-                                <div className="flex items-center gap-1 mt-4">
-                                    <TrendingUp size={16} className="text-clinical-green-600" />
-                                    <span className="text-sm text-clinical-green-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
-                                    <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                            {isMonthlyInquiryLoading ? (
+                                <div className="animate-pulse">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="h-4 w-28 bg-clinical-gray-200 rounded" />
+                                            <div className="h-8 w-24 bg-clinical-gray-200 rounded mt-2" />
+                                        </div>
+                                        <div className="w-12 h-12 bg-clinical-gray-200 rounded-lg" />
+                                    </div>
+                                    <div className="h-3 w-44 bg-clinical-gray-200 rounded mt-4" />
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-1 mt-4">
-                                    <TrendingDown size={16} className="text-clinical-red-600" />
-                                    <span className="text-sm text-clinical-red-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
-                                    <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                                <div className={`transition-opacity duration-700 ${monthlyInquiryVisible ? 'opacity-100' : 'opacity-0'}`}>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-clinical-gray-600">Diagnósticos</p>
+                                            <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyInquiryResume.total}</p>
+                                        </div>
+                                        <div className="w-12 h-12 bg-clinical-green-100 rounded-lg flex items-center justify-center">
+                                            <FileText className="text-clinical-green-600" size={24} />
+                                        </div>
+                                    </div>
+                                    {monthlyInquiryResume.changePercent > 0 ? (
+                                        <div className="flex items-center gap-1 mt-4">
+                                            <TrendingUp size={16} className="text-clinical-green-600" />
+                                            <span className="text-sm text-clinical-green-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
+                                            <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-1 mt-4">
+                                            <TrendingDown size={16} className="text-clinical-red-600" />
+                                            <span className="text-sm text-clinical-red-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
+                                            <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </CardContent>
