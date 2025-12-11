@@ -109,9 +109,9 @@ export default function PacientesPage() {
                     variant="primary"
                     onClick={() => {
                         try {
-                            router.push('/pacientes/nuevo');
+                            router.push('/dashboard/pacientes/nuevo');
                         } catch (err) {
-                            window.location.href = '/pacientes/nuevo';
+                            window.location.href = '/dashboard/pacientes/nuevo';
                         }
                     }}
                     className="w-full sm:w-auto"
@@ -217,7 +217,7 @@ export default function PacientesPage() {
                                                 try {
                                                     router.push(`/pacientes/${patient.id}/editar`);
                                                 } catch (err) {
-                                                    window.location.href = `/pacientes/${patient.id}/editar`;
+                                                    window.location.href = `/dashboard/pacientes/${patient.id}/editar`;
                                                 }
                                             }}
                                         >
@@ -239,7 +239,7 @@ export default function PacientesPage() {
                                                 try {
                                                     router.push(`/pacientes/${patient.id}/historial`);
                                                 } catch (err) {
-                                                    window.location.href = `/pacientes/${patient.id}/historial`;
+                                                    window.location.href = `/dashboard/pacientes/${patient.id}/historial`;
                                                 }
                                             }}
                                         >
@@ -252,7 +252,7 @@ export default function PacientesPage() {
                                                 try {
                                                     router.push(`/consulta/${patient.id}`);
                                                 } catch (err) {
-                                                    window.location.href = `/consulta/${patient.id}`;
+                                                    window.location.href = `/dashboard/consulta/${patient.id}`;
                                                 }
                                             }}
                                         >

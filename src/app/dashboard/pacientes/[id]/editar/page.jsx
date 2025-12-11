@@ -44,7 +44,7 @@ export default function EditarPacientePage() {
             console.log('Paciente actualizado:', updatedPatient);
 
             // Redirect to patients list
-            router.push('/pacientes');
+            router.push('/dashboard/pacientes');
         } catch (error) {
             console.error('Error updating patient:', error);
             throw error; // Re-throw to be handled by the form
@@ -52,7 +52,7 @@ export default function EditarPacientePage() {
     };
 
     const handleCancel = () => {
-        router.push('/pacientes');
+        router.push('/dashboard/pacientes');
     };
 
     if (isLoading) {

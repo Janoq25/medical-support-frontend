@@ -13,7 +13,7 @@ export default function NuevoPacientePage() {
             console.log('Paciente creado:', newPatient);
 
             // Redirect to patients list
-            router.push('/pacientes');
+            router.push('/dashboard/pacientes');
         } catch (error) {
             console.error('Error creating patient:', error);
             throw error; // Re-throw to be handled by the form
@@ -21,7 +21,7 @@ export default function NuevoPacientePage() {
     };
 
     const handleCancel = () => {
-        router.push('/pacientes');
+        router.push('/dashboard/pacientes');
     };
 
     return (
