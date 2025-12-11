@@ -52,3 +52,11 @@ export const getInquiryMonthlyResume = async () => {
   });
   return handleResponse(response);
 };
+
+export const getInquiryMonthlyChart = async (year = new Date().getFullYear()) => {
+    const response = await fetch(`${API_BASE_URL}/dashboard/monthly-inquiry-chart?year=${year}`, {
+        method: "GET",
+        cache: "no-store",
+    });
+    return handleResponse(response);
+}

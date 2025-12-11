@@ -5,7 +5,7 @@ import Badge from '@/components/ui/Badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, Users, FileText } from 'lucide-react';
 import { diagnosticsChartData, aiAssistanceChartData } from '@/services/mockData';
-import { getRecentPatients, getPatientMonthlyResume, getInquiryMonthlyResume } from '@/services/dashboardApi';
+import { getRecentPatients, getPatientMonthlyResume, getInquiryMonthlyResume, getInquiryMonthlyChart } from '@/services/dashboardApi';
 import { useState, useEffect } from 'react';
 import { FullScreenLoader } from '@/components/ui/Loader';
 
@@ -14,6 +14,11 @@ export default function DashboardPage() {
     const [recentPatients, setRecentPatients] = useState([]);
     const [monthlyPatientResume, setMonthlyPatientResume] = useState({total: 0, previous: 0, changePercent: 0});
     const [monthlyInquiryResume, setMonthlyInquiryResume] = useState({total: 0, previous: 0, changePercent: 0});
+    const [monthlyInquiryChart, setMonthlyInquiryChart] = useState([]);
+    const [isChartLoading, setIsChartLoading] = useState(false);
+    const currentYear = new Date().getFullYear();
+    const [selectedYear, setSelectedYear] = useState(currentYear);
+    const years = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4];
 
     // Obtener toda la data para el dashboard
     useEffect(() => {
@@ -28,12 +33,28 @@ export default function DashboardPage() {
                 
                 const monthlyInquiryData = await getInquiryMonthlyResume();
                 setMonthlyInquiryResume(monthlyInquiryData);
+
             } finally {
                 setIsLoading(false);
             }
         }
         getDashboardData();
     }, []);
+
+    useEffect(() => {
+        let active = true;
+        const fetchChart = async () => {
+            setIsChartLoading(true);
+            try {
+                const data = await getInquiryMonthlyChart(selectedYear);
+                if (active) setMonthlyInquiryChart(data);
+            } finally {
+                if (active) setIsChartLoading(false);
+            }
+        };
+        fetchChart();
+        return () => { active = false };
+    }, [selectedYear]);
 
     if(isLoading) {
         return <FullScreenLoader />;
@@ -51,32 +72,50 @@ export default function DashboardPage() {
                 {/* Diagnostics Chart */}
                 <Card className="lg:col-span-2">
                     <CardHeader>
-                        <CardTitle>Diagnósticos Realizados</CardTitle>
+                        <div className="flex items-center justify-between gap-4">
+                            <CardTitle>Diagnósticos Realizados</CardTitle>
+                            <select
+                                value={selectedYear}
+                                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                                className="px-3 py-2 border rounded-lg text-sm text-clinical-gray-700 bg-white"
+                            >
+                                {years.map((y) => (
+                                    <option key={y} value={y}>{y}</option>
+                                ))}
+                            </select>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <div className="h-[250px] lg:h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={diagnosticsChartData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                                    <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickMargin={10} />
-                                    <YAxis stroke="#6b7280" fontSize={12} />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: 'white',
-                                            border: '1px solid #e5e7eb',
-                                            borderRadius: '8px',
-                                            fontSize: '12px'
-                                        }}
-                                    />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="diagnosticos"
-                                        stroke="#2563eb"
-                                        strokeWidth={2}
-                                        dot={{ fill: '#2563eb', r: 4 }}
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
+                            {isChartLoading ? (
+                                <div className="h-full w-full bg-white border border-clinical-gray-200 rounded-lg overflow-hidden p-4 animate-pulse">
+                                    {/* <div className="h-4 w-1/4 bg-clinical-gray-200 rounded mb-4" /> */}
+                                    <div className="h-full bg-clinical-gray-200 rounded-xl" />
+                                </div>
+                            ) : (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={monthlyInquiryChart} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickMargin={10} />
+                                        <YAxis stroke="#6b7280" fontSize={12} domain={[0, 'dataMax']} allowDecimals={false} />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'white',
+                                                border: '1px solid #e5e7eb',
+                                                borderRadius: '8px',
+                                                fontSize: '12px'
+                                            }}
+                                        />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="total"
+                                            stroke="#2563eb"
+                                            strokeWidth={2}
+                                            dot={{ fill: '#2563eb', r: 4 }}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
