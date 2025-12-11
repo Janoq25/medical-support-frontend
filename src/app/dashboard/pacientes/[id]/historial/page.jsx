@@ -117,7 +117,7 @@ export default function PatientHistoryPage({ params }) {
                         <div className="w-full md:w-auto mt-4 md:mt-0">
                             <Button
                                 variant="primary"
-                                onClick={() => router.push(`/consulta/${id}`)}
+                                onClick={() => router.push(`/dashboard/consulta/${id}`)}
                                 className="w-full md:w-auto px-6 py-3 shadow-lg hover:shadow-xl transition-shadow flex justify-center"
                             >
                                 <Activity size={20} className="mr-2" />

@@ -215,7 +215,7 @@ export default function PacientesPage() {
                                             className="w-full sm:w-auto flex items-center justify-center"
                                             onClick={() => {
                                                 try {
-                                                    router.push(`/pacientes/${patient.id}/editar`);
+                                                    router.push(`/dashboard/pacientes/${patient.id}/editar`);
                                                 } catch (err) {
                                                     window.location.href = `/dashboard/pacientes/${patient.id}/editar`;
                                                 }
@@ -237,7 +237,7 @@ export default function PacientesPage() {
                                             className="w-full sm:w-auto flex items-center justify-center"
                                             onClick={() => {
                                                 try {
-                                                    router.push(`/pacientes/${patient.id}/historial`);
+                                                    router.push(`/dashboard/pacientes/${patient.id}/historial`);
                                                 } catch (err) {
                                                     window.location.href = `/dashboard/pacientes/${patient.id}/historial`;
                                                 }
@@ -250,7 +250,7 @@ export default function PacientesPage() {
                                             className="w-full sm:w-auto flex items-center justify-center"
                                             onClick={() => {
                                                 try {
-                                                    router.push(`/consulta/${patient.id}`);
+                                                    router.push(`/dashboard/consulta/${patient.id}`);
                                                 } catch (err) {
                                                     window.location.href = `/dashboard/consulta/${patient.id}`;
                                                 }
