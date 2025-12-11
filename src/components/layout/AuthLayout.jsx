@@ -13,7 +13,7 @@ export default function AuthLayout({ children }) {
           loop
           muted
         >
-          <source src="auth/decoration.mp4" type="video/mp4" />
+          <source src="/auth/decoration.mp4" type="video/mp4" />
         </video>
       </div>
 
