@@ -1,18 +1,26 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useTheme } from "@/context/ThemeContext";
+import { CheckCircle, AlertTriangle, Info, XCircle } from "lucide-react";
 
 const ToastContext = createContext(undefined);
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const counter = useRef(0);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const handler = (e) => {
       const { message, type = "info", duration = 4000 } = e.detail || {};
       const id = ++counter.current;
-      setToasts((prev) => [...prev, { id, message, type }]);
+      setToasts((prev) => [...prev, { id, message, type, visible: false }]);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, visible: true } : t)));
+        });
+      });
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
       }, duration);
@@ -24,21 +32,21 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{}}>
       {children}
-      <div className="fixed top-4 right-4 z-50 space-y-3">
+      <div className="fixed bottom-4 right-4 z-50 space-y-3 pointer-events-none">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`min-w-[260px] max-w-[360px] px-4 py-3 rounded-lg shadow-lg border transition-all duration-300 ${
-              t.type === "success"
-                ? "bg-clinical-green-50 border-clinical-green-200 text-clinical-green-700"
-                : t.type === "error"
-                ? "bg-clinical-red-50 border-clinical-red-200 text-clinical-red-700"
-                : t.type === "warning"
-                ? "bg-yellow-50 border-yellow-200 text-yellow-700"
-                : "bg-white border-clinical-gray-200 text-clinical-gray-800"
-            }`}
+            className={`min-w-[280px] max-w-[400px] px-4 py-3 rounded-lg shadow-lg border transition-all duration-300 transform flex items-start gap-3 pointer-events-auto
+              ${t.visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}
+              ${theme === "dark" ? "bg-gray-900 border-gray-700 text-white" : "bg-white border-clinical-gray-200 text-clinical-gray-900"}`}
           >
-            <span className="text-sm">{t.message}</span>
+            <span className={`mt-0.5`}>
+              {t.type === "success" && <CheckCircle size={18} className="text-clinical-green-600" />}
+              {t.type === "error" && <XCircle size={18} className="text-clinical-red-600" />}
+              {t.type === "warning" && <AlertTriangle size={18} className="text-yellow-600" />}
+              {t.type === "info" && <Info size={18} className="text-clinical-blue-600" />}
+            </span>
+            <span className="text-sm flex-1">{t.message}</span>
           </div>
         ))}
       </div>
