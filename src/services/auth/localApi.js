@@ -1,6 +1,7 @@
 "use client";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"; // NestJS API
+import { emitToast } from "@/services/utils/toast";
 
 const handleResponse = async (response) => {
   const contentType = response.headers.get("content-type");
@@ -10,6 +11,11 @@ const handleResponse = async (response) => {
   if (!response.ok) {
     const message =
       typeof data === "string" ? data : data?.message || "Error en la petición";
+    if (response.status === 401) {
+      emitToast({ message: "Tu sesión ha caducado. Por favor, inicia sesión nuevamente.", type: "warning" });
+    } else {
+      emitToast({ message, type: "error" });
+    }
     throw new Error(message);
   }
   console.log(data);

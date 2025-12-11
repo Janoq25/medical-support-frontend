@@ -1,6 +1,7 @@
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { ToastProvider } from '@/context/ToastContext';
 
 export const metadata = {
     title: "Erwin's Hospital",
@@ -12,7 +13,9 @@ export default function RootLayout({ children }) {
         <html lang="es">
             <body>
                 <ThemeProvider>
-                    <AuthProvider>{children}</AuthProvider>
+                    <ToastProvider>
+                        <AuthProvider>{children}</AuthProvider>
+                    </ToastProvider>
                 </ThemeProvider>
             </body>
         </html>
