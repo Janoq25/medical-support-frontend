@@ -18,6 +18,7 @@ import { requestAIOpinion } from "@/services/aiSimulation";
 import { getPatient } from "@/services/patientApi";
 import { createInquiry } from "@/services/inquiriesApi";
 import { emitToast } from "@/services/utils/toast";
+import { fetchAIResponse } from "@/services/aiApi";
 
 export default function ConsultaPage({ params }) {
   const resolvedParams = use(params);
@@ -100,7 +101,15 @@ export default function ConsultaPage({ params }) {
       ...ind,
       value: indicatorValues[ind.id] || 0,
     }));
-    const responses = await requestAIOpinion(indicatorsData);
+    console.log("Requesting AI opinion with indicators:", indicatorsData);
+    // const responses = await requestAIOpinion(indicatorsData);
+    const openaiResponse = await fetchAIResponse("openai/gpt-oss-120b:free");
+    const deepseekResponse = await fetchAIResponse("nex-agi/deepseek-v3.1-nex-n1:free");
+    const responses  = {
+      gpt: openaiResponse,
+      deepseek: deepseekResponse
+    }
+    console.log("Received AI responses:", responses);
     setAiResponses(responses);
     setLoadingAI(false);
   };
