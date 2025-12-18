@@ -22,7 +22,7 @@ export default function IndicadoresPage() {
         const fetchIndicators = async () => {
             try {
                 setIsLoading(true);
-                const data = await getIndicators();
+                const data = await getIndicators(searchQuery.trim() || undefined);
                 const indicatorList = Array.isArray(data) ? data : [];
                 setIndicators(indicatorList);
                 setError(null);
@@ -34,14 +34,9 @@ export default function IndicadoresPage() {
             }
         };
 
-        fetchIndicators();
-    }, []);
-
-    const filteredIndicators = indicators.filter(indicator =>
-        indicator.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        indicator.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        indicator.unit.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+        const handler = setTimeout(fetchIndicators, 300);
+        return () => clearTimeout(handler);
+    }, [searchQuery]);
 
     const handleDeleteClick = (indicator) => {
         setDeleteDialog({
@@ -124,67 +119,65 @@ export default function IndicadoresPage() {
                     </Card>
                 )}
 
-                {!isLoading && !error && filteredIndicators.map((indicator) => {
-                    return (
-                        <Card key={indicator.id} hover>
-                            <CardContent className="py-4">
-                                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                                    {/* Icon */}
-                                    <div className="w-12 h-12 rounded-full bg-clinical-blue-100 flex items-center justify-center text-clinical-blue-700 shrink-0">
-                                        <Activity size={24} />
-                                    </div>
-
-                                    {/* Indicator Info */}
-                                    <div className="flex-1 w-full md:w-auto">
-                                        <h3 className="font-semibold text-clinical-gray-900">{indicator.name}</h3>
-                                        <p className="text-sm text-clinical-gray-600">
-                                            Tipo: {indicator.type} • Unidad: {indicator.unit}
-                                        </p>
-                                        <p className="text-xs text-clinical-gray-500 mt-1">
-                                            Rango regular: {indicator.minRegularValue} - {indicator.maxRegularValue} {indicator.unit}
-                                        </p>
-                                    </div>
-
-                                    {/* Type Badge */}
-                                    <div className="self-start md:self-center">
-                                        <Badge variant="stable">
-                                            {indicator.type}
-                                        </Badge>
-                                    </div>
-
-                                    {/* Actions */}
-                                    <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto mt-2 md:mt-0">
-                                        <Button
-                                            variant="outline"
-                                            className="w-full sm:w-auto flex items-center justify-center"
-                                            onClick={() => {
-                                                try {
-                                                    router.push(`/dashboard/indicadores/${indicator.id}/editar`);
-                                                } catch (err) {
-                                                    window.location.href = `/dashboard/indicadores/${indicator.id}/editar`;
-                                                }
-                                            }}
-                                        >
-                                            <Pencil size={16} className="mr-2" />
-                                            Editar
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            className="w-full sm:w-auto flex items-center justify-center text-clinical-red-600 hover:bg-clinical-red-50 border-clinical-red-300"
-                                            onClick={() => handleDeleteClick(indicator)}
-                                        >
-                                            <Trash2 size={16} className="mr-2" />
-                                            Eliminar
-                                        </Button>
-                                    </div>
+                {!isLoading && !error && indicators.map((indicator) => (
+                    <Card key={indicator.id} hover>
+                        <CardContent className="py-4">
+                            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                                {/* Icon */}
+                                <div className="w-12 h-12 rounded-full bg-clinical-blue-100 flex items-center justify-center text-clinical-blue-700 shrink-0">
+                                    <Activity size={24} />
                                 </div>
-                            </CardContent>
-                        </Card>
-                    );
-                })}
+
+                                {/* Indicator Info */}
+                                <div className="flex-1 w-full md:w-auto">
+                                    <h3 className="font-semibold text-clinical-gray-900">{indicator.name}</h3>
+                                    <p className="text-sm text-clinical-gray-600">
+                                        Tipo: {indicator.type} · Unidad: {indicator.unit}
+                                    </p>
+                                    <p className="text-xs text-clinical-gray-500 mt-1">
+                                        Rango regular: {indicator.minRegularValue} - {indicator.maxRegularValue} {indicator.unit}
+                                    </p>
+                                </div>
+
+                                {/* Type Badge */}
+                                <div className="self-start md:self-center">
+                                    <Badge variant="stable">
+                                        {indicator.type}
+                                    </Badge>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto mt-2 md:mt-0">
+                                    <Button
+                                        variant="outline"
+                                        className="w-full sm:w-auto flex items-center justify-center"
+                                        onClick={() => {
+                                            try {
+                                                router.push(`/dashboard/indicadores/${indicator.id}/editar`);
+                                            } catch (err) {
+                                                window.location.href = `/dashboard/indicadores/${indicator.id}/editar`;
+                                            }
+                                        }}
+                                    >
+                                        <Pencil size={16} className="mr-2" />
+                                        Editar
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full sm:w-auto flex items-center justify-center text-clinical-red-600 hover:bg-clinical-red-50 border-clinical-red-300"
+                                        onClick={() => handleDeleteClick(indicator)}
+                                    >
+                                        <Trash2 size={16} className="mr-2" />
+                                        Eliminar
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
 
-            {!isLoading && !error && filteredIndicators.length === 0 && (
+            {!isLoading && !error && indicators.length === 0 && (
                 <div className="text-center py-12">
                     <p className="text-clinical-gray-500">
                         {searchQuery
@@ -201,7 +194,7 @@ export default function IndicadoresPage() {
                 onClose={handleDeleteCancel}
                 onConfirm={handleDeleteConfirm}
                 title="Eliminar Indicador"
-                message={`¿Está seguro que desea eliminar el indicador "${deleteDialog.indicatorName}"? Esta acción no se puede deshacer.`}
+                message={`¿Estás seguro que desea eliminar el indicador "${deleteDialog.indicatorName}"? Esta acción no se puede deshacer.`}
                 confirmText="Eliminar"
                 cancelText="Cancelar"
                 variant="danger"
