@@ -108,9 +108,28 @@ export default function ConsultaPage({ params }) {
             setSaveError(null);
             setSaveSuccess(false);
 
+<<<<<<< Updated upstream
             if (!diagnosis.trim()) {
                 throw new Error('Ingrese un diagnóstico antes de guardar la consulta');
             }
+=======
+    const indicatorsData = indicators.map((ind) => ({
+      ...ind,
+      value: indicatorValues[ind.id] || 0,
+    }));
+    console.log("Requesting AI opinion with indicators:", indicatorsData);
+    // const responses = await requestAIOpinion(indicatorsData);
+    const openaiResponse = await fetchAIResponse("openai/gpt-oss-120b:free");
+    const deepseekResponse = await fetchAIResponse("nex-agi/deepseek-v3.1-nex-n1:free");
+    const responses = {
+      gpt: openaiResponse,
+      deepseek: deepseekResponse
+    }
+    console.log("Received AI responses:", responses);
+    setAiResponses(responses);
+    setLoadingAI(false);
+  };
+>>>>>>> Stashed changes
 
             const type_diagnosis = selectedModel === 'gpt'
                 ? 'chatgpt'
@@ -167,6 +186,57 @@ export default function ConsultaPage({ params }) {
         );
     }
 
+<<<<<<< Updated upstream
+=======
+  const showFeedbackToast = (message) => {
+    emitToast({ message, type: "info" });
+  };
+
+  const handleSaveInquiry = async () => {
+    try {
+      setSaving(true);
+      setSaveError(null);
+      setSaveSuccess(false);
+
+      if (!diagnosis.trim()) {
+        throw new Error("Ingrese un diagnóstico antes de guardar la consulta");
+      }
+
+      const type_diagnosis =
+        selectedModel === "gpt"
+          ? "chatgpt"
+          : selectedModel === "deepseek"
+            ? "deepseek"
+            : "normal";
+
+      const modelData =
+        selectedModel && aiResponses ? aiResponses[selectedModel] : null;
+
+      const payload = {
+        patientId,
+        diagnosis,
+        patient_state: patientState,
+        type_diagnosis,
+        feedback,
+        risk_level: null,
+        ai_prompt: modelData?.prompt || null,
+        ai_response: modelData?.diagnosis || null,
+        ai_confidence: modelData?.confidence || null,
+        indicators: [], // Sin indicadores reales en backend aún
+      };
+
+      await createInquiry(payload);
+      setSaveSuccess(true);
+    } catch (err) {
+      console.error("Error saving inquiry:", err);
+      setSaveError(err.message || "No se pudo guardar la consulta");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loadingPatient) {
+>>>>>>> Stashed changes
     return (
         <div className="space-y-6 max-w-[1600px]">
             {/* Breadcrumb */}
@@ -193,8 +263,331 @@ export default function ConsultaPage({ params }) {
                         <option value="critical">Crítico</option>
                     </select>
                 </div>
+<<<<<<< Updated upstream
+=======
+              ) : (
+                <>
+                  {/* Calculadora de Indicadores Físicos */}
+                  <div>
+                    <h4 className="font-semibold text-clinical-gray-900 mb-3">
+                      Calculadora de Indicadores Físicos
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Input
+                        label="Estatura (m)"
+                        type="number"
+                        step="0.01"
+                        value={calcInputs.heightM}
+                        onChange={(e) =>
+                          setCalcInputs((ci) => ({
+                            ...ci,
+                            heightM: e.target.value,
+                          }))
+                        }
+                        placeholder="Ej: 1.75"
+                      />
+                      <Input
+                        label="Peso actual (kg)"
+                        type="number"
+                        step="0.1"
+                        value={calcInputs.weightKg}
+                        onChange={(e) =>
+                          setCalcInputs((ci) => ({
+                            ...ci,
+                            weightKg: e.target.value,
+                          }))
+                        }
+                        placeholder="Ej: 68.5"
+                      />
+                      <Input
+                        label="Peso inicial hace 3 meses (kg)"
+                        type="number"
+                        step="0.1"
+                        value={calcInputs.initialWeightKg}
+                        onChange={(e) =>
+                          setCalcInputs((ci) => ({
+                            ...ci,
+                            initialWeightKg: e.target.value,
+                          }))
+                        }
+                        placeholder="Ej: 72.0"
+                      />
+                    </div>
+                    <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="p-3 bg-clinical-gray-50 rounded-lg border border-clinical-gray-200">
+                        <p className="text-sm text-clinical-gray-600">
+                          IMC (kg/m²)
+                        </p>
+                        <p className="text-lg font-semibold text-clinical-blue-700">
+                          {computeBMI() !== null
+                            ? computeBMI().toFixed(2)
+                            : "—"}
+                        </p>
+                      </div>
+                      <div className="p-3 bg-clinical-gray-50 rounded-lg border border-clinical-gray-200">
+                        <p className="text-sm text-clinical-gray-600">
+                          Variación de peso (%)
+                        </p>
+                        <p className="text-lg font-semibold text-clinical-blue-700">
+                          {computeWeightVariation() !== null
+                            ? computeWeightVariation().toFixed(2)
+                            : "—"}
+                        </p>
+                      </div>
+                      <div className="flex items-center">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={applyCalculatedIndicators}
+                        >
+                          Aplicar a indicadores
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Helper for normalization */}
+                  {(() => {
+                    const normalizeType = (type) =>
+                      type
+                        ? type
+                          .toLowerCase()
+                          .normalize("NFD")
+                          .replace(/[\u0300-\u036f]/g, "")
+                        : "";
+
+                    const getType = (ind) => normalizeType(ind.type);
+
+                    return (
+                      <>
+                        {/* Indicadores Psicológicos */}
+                        <div>
+                          <h4 className="font-semibold text-clinical-gray-900 mb-3">
+                            Indicadores Psicológicos
+                          </h4>
+                          <div className="grid grid-cols-2 gap-4">
+                            {indicators
+                              .filter((ind) => getType(ind) === "psicologico")
+                              .map((indicator) => (
+                                <div key={indicator.id}>
+                                  <Input
+                                    label={indicator.name}
+                                    type="number"
+                                    step="1"
+                                    value={indicatorValues[indicator.id] || 0}
+                                    onChange={(e) =>
+                                      updateIndicatorValue(
+                                        indicator.id,
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+
+                        {/* Indicadores Conductuales */}
+                        <div>
+                          <h4 className="font-semibold text-clinical-gray-900 mb-3">
+                            Indicadores Conductuales
+                          </h4>
+                          <div className="grid grid-cols-2 gap-4">
+                            {indicators
+                              .filter((ind) => getType(ind) === "conductual")
+                              .map((indicator) => (
+                                <div key={indicator.id}>
+                                  <Input
+                                    label={indicator.name}
+                                    type="number"
+                                    step="1"
+                                    value={indicatorValues[indicator.id] || 0}
+                                    onChange={(e) =>
+                                      updateIndicatorValue(
+                                        indicator.id,
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+
+                        {/* Otros Indicadores (Catch-all for new/unknown types) */}
+                        {indicators.some(
+                          (ind) =>
+                            !["fisico", "psicologico", "conductual"].includes(
+                              getType(ind)
+                            )
+                        ) && (
+                            <div>
+                              <h4 className="font-semibold text-clinical-gray-900 mb-3">
+                                Otros Indicadores
+                              </h4>
+                              <div className="grid grid-cols-2 gap-4">
+                                {indicators
+                                  .filter(
+                                    (ind) =>
+                                      ![
+                                        "fisico",
+                                        "psicologico",
+                                        "conductual",
+                                      ].includes(getType(ind))
+                                  )
+                                  .map((indicator) => (
+                                    <div key={indicator.id}>
+                                      <Input
+                                        label={indicator.name}
+                                        type="number"
+                                        step="any"
+                                        value={indicatorValues[indicator.id] || 0}
+                                        onChange={(e) =>
+                                          updateIndicatorValue(
+                                            indicator.id,
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
+                      </>
+                    );
+                  })()}
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Request AI Button */}
+          <Button
+            variant="primary"
+            className="w-full py-4 text-lg flex items-center justify-center gap-2"
+            onClick={handleRequestAI}
+            disabled={loadingAI}
+          >
+            {loadingAI ? (
+              <>
+                <Loader2 className="animate-spin" size={20} />
+                Consultando IA...
+              </>
+            ) : (
+              <>
+                <Sparkles size={20} />
+                Solicitar Segunda Opinión IA
+              </>
+            )}
+          </Button>
+
+          {/* Diagnosis Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Diagnóstico Final</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                label="Diagnóstico"
+                value={diagnosis}
+                onChange={(e) => setDiagnosis(e.target.value)}
+                rows={8}
+                placeholder="Escriba el diagnóstico final aquí o seleccione una respuesta de IA..."
+              />
+
+              <div className="space-y-2">
+                <label className="text-sm text-clinical-gray-700">
+                  Feedback / Notas
+                </label>
+                <Textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  rows={4}
+                  placeholder="Observaciones, plan de acción, motivos de la selección..."
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                {/* <label className="">
+                  Estado del paciente
+                </label>  */}
+                {/* <select
+                  value={patientState}
+                  onChange={(e) => setPatientState(e.target.value)}
+                  className="border border-clinical-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-clinical-blue-500 focus:outline-none"
+                >
+                  <option value="stable">Estable</option>
+                  <option value="in_treatment">En tratamiento</option>
+                  <option value="critical">Crítico</option>
+                </select> */}
+                <OptionsGroup
+                  options={[
+                    { value: "stable", label: "Estable" },
+                    { value: "in_treatment", label: "En tratamiento" },
+                    { value: "critical", label: "Crítico" },
+                  ]}
+                  defaultValue={patientState}
+                  onSelect={setPatientState}
+                  label="Estado del paciente"
+                />
+              </div>
+
+              {saveError && (
+                <div className="bg-clinical-red-50 border border-clinical-red-200 text-clinical-red-700 px-4 py-3 rounded-lg text-sm">
+                  {saveError}
+                </div>
+              )}
+              {saveSuccess && (
+                <div className="bg-clinical-green-50 border border-clinical-green-200 text-clinical-green-700 px-4 py-3 rounded-lg text-sm">
+                  Consulta guardada correctamente.
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <Button
+                  variant="primary"
+                  className="flex-1 flex items-center justify-center gap-2"
+                  onClick={handleSaveInquiry}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      Guardando...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={16} />
+                      Guardar Consulta
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* RIGHT COLUMN - AI Responses */}
+        <div className="space-y-6">
+          {loadingAI && (
+            <div className="space-y-4">
+              {[1, 2].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="py-6">
+                    <div className="h-4 bg-clinical-gray-200 rounded w-1/3 mb-4"></div>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-clinical-gray-200 rounded"></div>
+                      <div className="h-3 bg-clinical-gray-200 rounded"></div>
+                      <div className="h-3 bg-clinical-gray-200 rounded w-5/6"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+>>>>>>> Stashed changes
             </div>
 
+<<<<<<< Updated upstream
             {/* Split Screen Layout */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* LEFT COLUMN - Inputs */}
@@ -228,6 +621,38 @@ export default function ConsultaPage({ params }) {
                                             ))}
                                         </div>
                                     </div>
+=======
+          {aiResponses && !loadingAI && (
+            <>
+              {/* GPT Response */}
+              <Card
+                hover
+                className={`group relative cursor-pointer transition-all ${selectedModel === "gpt"
+                  ? "ring-2 ring-clinical-green-500"
+                  : ""
+                  }`}
+              >
+                <CardHeader className="bg-clinical-green-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-clinical-green-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                        AI
+                      </div>
+                      <CardTitle className="text-clinical-green-700">
+                        Respuesta de GPT
+                      </CardTitle>
+                    </div>
+                    <span className="text-xs text-clinical-gray-600">
+                      Confianza: {(aiResponses.gpt.confidence * 100).toFixed(0)}
+                      %
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-clinical-gray-700 leading-relaxed">
+                    {aiResponses.gpt.diagnosis}
+                  </p>
+>>>>>>> Stashed changes
 
                                     {/* Indicadores Psicológicos */}
                                     <div>
@@ -325,6 +750,7 @@ export default function ConsultaPage({ params }) {
                         )}
                     </Button>
 
+<<<<<<< Updated upstream
                     {/* Diagnosis Section */}
                     <Card>
                         <CardHeader>
@@ -338,6 +764,36 @@ export default function ConsultaPage({ params }) {
                                 rows={8}
                                 placeholder="Escriba el diagnóstico final aquí o seleccione una respuesta de IA..."
                             />
+=======
+              {/* DeepSeek Response */}
+              <Card
+                hover
+                className={`group relative cursor-pointer transition-all ${selectedModel === "deepseek"
+                  ? "ring-2 ring-clinical-blue-500"
+                  : ""
+                  }`}
+              >
+                <CardHeader className="bg-clinical-blue-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-clinical-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                        DS
+                      </div>
+                      <CardTitle className="text-clinical-blue-700">
+                        Respuesta de DeepSeek
+                      </CardTitle>
+                    </div>
+                    <span className="text-xs text-clinical-gray-600">
+                      Confianza:{" "}
+                      {(aiResponses.deepseek.confidence * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-clinical-gray-700 leading-relaxed">
+                    {aiResponses.deepseek.diagnosis}
+                  </p>
+>>>>>>> Stashed changes
 
                             <div className="space-y-2">
                                 <label className="text-sm text-clinical-gray-700">Feedback / Notas</label>
@@ -429,12 +885,39 @@ export default function ConsultaPage({ params }) {
                                         {aiResponses.gpt.diagnosis}
                                     </p>
 
+<<<<<<< Updated upstream
                                     <button
                                         onClick={() => setShowPrompt(prev => ({ ...prev, gpt: !prev.gpt }))}
                                         className="text-xs text-clinical-blue-600 hover:text-clinical-blue-700 cursor-pointer"
                                     >
                                         {showPrompt.gpt ? 'Ocultar' : 'Ver'} prompt enviado
                                     </button>
+=======
+              {/* Feedback Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Feedback de Selección</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-clinical-gray-600">
+                    Justifica por qué elegiste{" "}
+                    {selectedModel === "gpt"
+                      ? "GPT"
+                      : selectedModel === "deepseek"
+                        ? "DeepSeek"
+                        : "un modelo de IA"}
+                  </p>
+                  <Textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    rows={4}
+                    placeholder="Ej: Seleccioné DeepSeek porque proporcionó un análisis más detallado..."
+                  />
+                </CardContent>
+              </Card>
+            </>
+          )}
+>>>>>>> Stashed changes
 
                                     {showPrompt.gpt && (
                                         <div className="bg-clinical-gray-50 p-3 rounded-lg text-xs text-clinical-gray-600 font-mono">

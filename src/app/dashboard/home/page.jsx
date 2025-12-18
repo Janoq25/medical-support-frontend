@@ -205,12 +205,12 @@ export default function DashboardPage() {
                                         </div>
                                         <Badge variant={patient.lastState === 'critical' ? 'critical' : 'stable'}>
                                             {patient.lastState === 'critical'
-                                                    ? 'Crítico'
-                                                    : patient.lastState === 'stable'
+                                                ? 'Crítico'
+                                                : patient.lastState === 'stable'
                                                     ? 'Estable'
                                                     : patient.lastState === 'in_treatment'
-                                                    ? 'En tratamiento'
-                                                    : ''}
+                                                        ? 'En tratamiento'
+                                                        : ''}
                                         </Badge>
                                     </div>
                                 ))}
@@ -268,88 +268,88 @@ export default function DashboardPage() {
                 {/* Statistics Cards */}
                 <div className="space-y-6">
                     <Card>
-                        <CardContent className="pt-6">
-                            {isMonthlyPatientLoading ? (
-                                <div className="animate-pulse">
-                                    <div className="flex items-center justify-between">
-                                        <div>
+                    <CardContent className="pt-6">
+                        {isMonthlyPatientLoading ? (
+                            <div className="animate-pulse">
+                                <div className="flex items-center justify-between">
+                                    <div>
                                             <div className="h-4 w-24 bg-clinical-gray-200 rounded" />
                                             <div className="h-8 w-20 bg-clinical-gray-200 rounded mt-2" />
-                                        </div>
-                                        <div className="w-12 h-12 bg-clinical-gray-200 rounded-lg" />
                                     </div>
-                                    <div className="h-3 w-40 bg-clinical-gray-200 rounded mt-4" />
+                                        <div className="w-12 h-12 bg-clinical-gray-200 rounded-lg" />
                                 </div>
-                            ) : (
-                                <div className={`transition-opacity duration-700 ${monthlyPatientVisible ? 'opacity-100' : 'opacity-0'}`}>
-                                    <div className="flex items-center justify-between">
-                                        <div>
+                                    <div className="h-3 w-40 bg-clinical-gray-200 rounded mt-4" />
+                            </div>
+                        ) : (
+                            <div className={`transition-opacity duration-700 ${monthlyPatientVisible ? 'opacity-100' : 'opacity-0'}`}>
+                                <div className="flex items-center justify-between">
+                                    <div>
                                             <p className="text-sm text-clinical-gray-600">Pacientes</p>
                                             <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyPatientResume.total}</p>
-                                        </div>
+                                    </div>
                                         <div className="w-12 h-12 bg-clinical-blue-100 rounded-lg flex items-center justify-center">
                                             <Users className="text-clinical-blue-600" size={24} />
-                                        </div>
                                     </div>
-                                    {monthlyPatientResume.changePercent > 0 ? (
-                                        <div className="flex items-center gap-1 mt-4">
+                                </div>
+                                {monthlyPatientResume.changePercent > 0 ? (
+                                    <div className="flex items-center gap-1 mt-4">
                                         <TrendingUp size={16} className="text-clinical-green-600" />
                                         <span className="text-sm text-clinical-green-600 font-medium">{monthlyPatientResume.changePercent}%</span>
                                         <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
                                     </div>
-                                    ) : (
-                                        <div className="flex items-center gap-1 mt-4">
+                                ) : (
+                                    <div className="flex items-center gap-1 mt-4">
                                             <TrendingDown size={16} className="text-clinical-red-600" />
                                             <span className="text-sm text-clinical-red-600 font-medium">{monthlyPatientResume.changePercent}%</span>
                                             <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
                     <Card>
-                        <CardContent className="pt-6">
-                            {isMonthlyInquiryLoading ? (
-                                <div className="animate-pulse">
-                                    <div className="flex items-center justify-between">
-                                        <div>
+                    <CardContent className="pt-6">
+                        {isMonthlyInquiryLoading ? (
+                            <div className="animate-pulse">
+                                <div className="flex items-center justify-between">
+                                    <div>
                                             <div className="h-4 w-28 bg-clinical-gray-200 rounded" />
                                             <div className="h-8 w-24 bg-clinical-gray-200 rounded mt-2" />
-                                        </div>
-                                        <div className="w-12 h-12 bg-clinical-gray-200 rounded-lg" />
                                     </div>
-                                    <div className="h-3 w-44 bg-clinical-gray-200 rounded mt-4" />
+                                        <div className="w-12 h-12 bg-clinical-gray-200 rounded-lg" />
                                 </div>
-                            ) : (
-                                <div className={`transition-opacity duration-700 ${monthlyInquiryVisible ? 'opacity-100' : 'opacity-0'}`}>
-                                    <div className="flex items-center justify-between">
-                                        <div>
+                                    <div className="h-3 w-44 bg-clinical-gray-200 rounded mt-4" />
+                            </div>
+                        ) : (
+                            <div className={`transition-opacity duration-700 ${monthlyInquiryVisible ? 'opacity-100' : 'opacity-0'}`}>
+                                <div className="flex items-center justify-between">
+                                    <div>
                                             <p className="text-sm text-clinical-gray-600">Diagnósticos</p>
                                             <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyInquiryResume.total}</p>
-                                        </div>
+                                    </div>
                                         <div className="w-12 h-12 bg-clinical-green-100 rounded-lg flex items-center justify-center">
                                             <FileText className="text-clinical-green-600" size={24} />
-                                        </div>
                                     </div>
-                                    {monthlyInquiryResume.changePercent > 0 ? (
-                                        <div className="flex items-center gap-1 mt-4">
+                                </div>
+                                {monthlyInquiryResume.changePercent > 0 ? (
+                                    <div className="flex items-center gap-1 mt-4">
                                             <TrendingUp size={16} className="text-clinical-green-600" />
                                             <span className="text-sm text-clinical-green-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
                                             <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-1 mt-4">
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-1 mt-4">
                                             <TrendingDown size={16} className="text-clinical-red-600" />
                                             <span className="text-sm text-clinical-red-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
                                             <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
                 </div>
             </div>
         </div>
