@@ -13,6 +13,7 @@ import {
   Check,
   Save,
 } from "lucide-react";
+import { generateConsultationPrompt } from "@/services/utils/promptGenerator";
 import { getIndicators } from "@/services/indicatorsApi";
 import { requestAIOpinion } from "@/services/aiSimulation";
 import { getPatient } from "@/services/patientApi";
@@ -97,21 +98,29 @@ export default function ConsultaPage({ params }) {
     setSaveError(null);
     setSaveSuccess(false);
 
-    const indicatorsData = indicators.map((ind) => ({
-      ...ind,
-      value: indicatorValues[ind.id] || 0,
-    }));
-    console.log("Requesting AI opinion with indicators:", indicatorsData);
-    // const responses = await requestAIOpinion(indicatorsData);
-    const openaiResponse = await fetchAIResponse("openai/gpt-oss-120b:free");
-    const deepseekResponse = await fetchAIResponse("nex-agi/deepseek-v3.1-nex-n1:free");
-    const responses = {
-      gpt: openaiResponse,
-      deepseek: deepseekResponse
+    try {
+      const prompt = generateConsultationPrompt(patient, indicators, indicatorValues);
+      console.log("Generated Prompt:", prompt);
+
+      // Parallel requests (optimized)
+      const [openaiResponse, deepseekResponse] = await Promise.all([
+        fetchAIResponse("openai/gpt-oss-120b:free", prompt),
+        fetchAIResponse("nex-agi/deepseek-v3.1-nex-n1:free", prompt)
+      ]);
+
+      const responses = {
+        gpt: { ...openaiResponse, prompt }, // Inject prompt into response object for display
+        deepseek: { ...deepseekResponse, prompt } // Inject prompt into response object for display
+      };
+
+      console.log("Received AI responses:", responses);
+      setAiResponses(responses);
+    } catch (error) {
+      console.error("Error soliciting AI opinion:", error);
+      emitToast({ message: "Error al consultar a la IA. Intente nuevamente.", type: "error" });
+    } finally {
+      setLoadingAI(false);
     }
-    console.log("Received AI responses:", responses);
-    setAiResponses(responses);
-    setLoadingAI(false);
   };
 
   const handleSelectDiagnosis = (model, diagnosisText) => {
