@@ -3,7 +3,7 @@ import React from 'react';
 export default function Card({ children, className = '', hover = false }) {
     return (
         <div
-            className={`bg-white rounded-xl border border-clinical-gray-200 shadow-sm ${hover ? 'transition-shadow hover:shadow-md' : ''
+            className={`card-biophilic ${hover ? 'transition-soft hover:shadow-soft hover:-translate-y-1' : ''
                 } ${className}`}
         >
             {children}
@@ -13,7 +13,7 @@ export default function Card({ children, className = '', hover = false }) {
 
 export function CardHeader({ children, className = '' }) {
     return (
-        <div className={`px-6 py-4 border-b border-clinical-gray-200 ${className}`}>
+        <div className={`px-8 py-6 border-b border-sage-100/50 ${className}`}>
             {children}
         </div>
     );
@@ -21,7 +21,7 @@ export function CardHeader({ children, className = '' }) {
 
 export function CardContent({ children, className = '' }) {
     return (
-        <div className={`px-6 py-4 ${className}`}>
+        <div className={`px-8 py-6 ${className}`}>
             {children}
         </div>
     );
@@ -29,7 +29,7 @@ export function CardContent({ children, className = '' }) {
 
 export function CardTitle({ children, className = '' }) {
     return (
-        <h3 className={`text-lg font-semibold text-clinical-gray-900 ${className}`}>
+        <h3 className={`text-xl font-bold text-sage-900 tracking-tight ${className}`}>
             {children}
         </h3>
     );

@@ -10,8 +10,8 @@ import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
     const [recentPatients, setRecentPatients] = useState([]);
-    const [monthlyPatientResume, setMonthlyPatientResume] = useState({total: 0, previous: 0, changePercent: 0});
-    const [monthlyInquiryResume, setMonthlyInquiryResume] = useState({total: 0, previous: 0, changePercent: 0});
+    const [monthlyPatientResume, setMonthlyPatientResume] = useState({ total: 0, previous: 0, changePercent: 0 });
+    const [monthlyInquiryResume, setMonthlyInquiryResume] = useState({ total: 0, previous: 0, changePercent: 0 });
     const [monthlyInquiryChart, setMonthlyInquiryChart] = useState([]);
     const [isChartLoading, setIsChartLoading] = useState(false);
     const [isRecentLoading, setIsRecentLoading] = useState(true);
@@ -110,8 +110,8 @@ export default function DashboardPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold text-clinical-gray-900">Dashboard</h1>
-                <p className="text-clinical-gray-600 mt-1">Resumen general del sistema</p>
+                <h1 className="text-3xl font-bold text-sage-900 tracking-tight">Dashboard</h1>
+                <p className="text-sage-500 mt-1 font-medium">Resumen general del sistema</p>
             </div>
 
             {/* Row 1: Chart + Recent Patients */}
@@ -124,7 +124,7 @@ export default function DashboardPage() {
                             <select
                                 value={selectedYear}
                                 onChange={(e) => setSelectedYear(Number(e.target.value))}
-                                className="px-3 py-2 border rounded-lg text-sm text-clinical-gray-700 bg-white"
+                                className="px-4 py-2 border-none rounded-full text-sm text-sage-700 bg-sage-50 hover:bg-sage-100 cursor-pointer focus:ring-2 focus:ring-sage-200"
                             >
                                 {years.map((y) => (
                                     <option key={y} value={y}>{y}</option>
@@ -135,30 +135,46 @@ export default function DashboardPage() {
                     <CardContent>
                         <div className="h-[250px] lg:h-[300px] w-full">
                             {isChartLoading ? (
-                                <div className="h-full w-full bg-white border border-clinical-gray-200 rounded-lg overflow-hidden p-4 animate-pulse">
-                                    {/* <div className="h-4 w-1/4 bg-clinical-gray-200 rounded mb-4" /> */}
-                                    <div className="h-full bg-clinical-gray-200 rounded-xl" />
+                                <div className="h-full w-full bg-white/50 rounded-3xl overflow-hidden p-4 animate-pulse">
+                                    <div className="h-full bg-sage-50 rounded-2xl" />
                                 </div>
                             ) : (
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={monthlyInquiryChart} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                                        <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickMargin={10} />
-                                        <YAxis stroke="#6b7280" fontSize={12} domain={[0, 'dataMax']} allowDecimals={false} />
+                                    <LineChart data={monthlyInquiryChart} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                        <XAxis
+                                            dataKey="month"
+                                            stroke="var(--color-primary)"
+                                            fontSize={12}
+                                            tickMargin={10}
+                                            tickLine={false}
+                                            axisLine={false}
+                                        />
+                                        <YAxis
+                                            stroke="var(--color-primary)"
+                                            fontSize={12}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            domain={[0, 'auto']}
+                                            allowDecimals={false}
+                                        />
                                         <Tooltip
                                             contentStyle={{
-                                                backgroundColor: 'white',
-                                                border: '1px solid #e5e7eb',
-                                                borderRadius: '8px',
-                                                fontSize: '12px'
+                                                backgroundColor: 'var(--color-background-muted)',
+                                                border: '1px solid var(--color-sand-200)',
+                                                borderRadius: '16px',
+                                                boxShadow: 'var(--shadow-soft)',
+                                                fontSize: '12px',
+                                                color: 'var(--color-text-main)'
                                             }}
                                         />
                                         <Line
-                                            type="monotone"
+                                            type="natural"
                                             dataKey="total"
-                                            stroke="#2563eb"
-                                            strokeWidth={2}
-                                            dot={{ fill: '#2563eb', r: 4 }}
+                                            stroke="var(--color-primary)"
+                                            strokeWidth={3}
+                                            dot={{ fill: 'var(--color-primary)', r: 4, strokeWidth: 0 }}
+                                            activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--color-primary)' }}
                                         />
                                     </LineChart>
                                 </ResponsiveContainer>
@@ -177,27 +193,26 @@ export default function DashboardPage() {
                             <div className="space-y-4">
                                 {[...Array(5)].map((_, i) => (
                                     <div key={i} className="flex items-center gap-3 animate-pulse">
-                                        <div className="w-10 h-10 rounded-full bg-clinical-gray-200" />
+                                        <div className="w-10 h-10 rounded-full bg-sage-100" />
                                         <div className="flex-1 min-w-0">
-                                            <div className="h-4 w-1/3 bg-clinical-gray-200 rounded mb-2" />
-                                            <div className="h-3 w-1/4 bg-clinical-gray-200 rounded" />
+                                            <div className="h-4 w-1/3 bg-sage-100 rounded mb-2" />
+                                            <div className="h-3 w-1/4 bg-sage-50 rounded" />
                                         </div>
-                                        <div className="h-6 w-20 bg-clinical-gray-200 rounded" />
                                     </div>
                                 ))}
                             </div>
                         ) : (
                             <div className={`space-y-4 transition-opacity duration-700 ${recentVisible ? 'opacity-100' : 'opacity-0'}`}>
                                 {recentPatients.map((patient, index) => (
-                                    <div key={index} className={`flex items-center gap-3 transition-all duration-700 ease-out ${index < recentRevealCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
-                                        <div className="w-10 h-10 rounded-full bg-clinical-blue-100 flex items-center justify-center text-clinical-blue-700 font-semibold text-sm">
+                                    <div key={index} className={`flex items-center gap-4 p-2 hover:bg-white/50 rounded-2xl transition-all duration-300 ease-out ${index < recentRevealCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
+                                        <div className="w-10 h-10 rounded-full bg-sage-100 flex items-center justify-center text-sage-700 font-bold text-sm shadow-sm">
                                             {patient.initials}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium text-clinical-gray-900 truncate">
+                                            <p className="text-sm font-bold text-sage-900 truncate">
                                                 {`${patient.name} ${patient.lastname}`}
                                             </p>
-                                            <p className="text-xs text-clinical-gray-500 truncate">
+                                            <p className="text-xs text-sage-500 truncate font-medium">
                                                 {patient.lastState === 'critical'
                                                     ? 'Paciente TCA'
                                                     : 'Seguimiento'}
@@ -230,34 +245,38 @@ export default function DashboardPage() {
                     <CardContent>
                         <div className="h-[250px] lg:h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={aiAssistanceChartData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                                    <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickMargin={10} />
-                                    <YAxis stroke="#6b7280" fontSize={12} />
+                                <LineChart data={aiAssistanceChartData} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                    <XAxis dataKey="month" stroke="var(--color-primary)" fontSize={12} tickMargin={10} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="var(--color-primary)" fontSize={12} tickLine={false} axisLine={false} />
                                     <Tooltip
                                         contentStyle={{
-                                            backgroundColor: 'white',
-                                            border: '1px solid #e5e7eb',
-                                            borderRadius: '8px',
-                                            fontSize: '12px'
+                                            backgroundColor: 'var(--color-background-muted)',
+                                            border: '1px solid var(--color-sand-200)',
+                                            borderRadius: '16px',
+                                            boxShadow: 'var(--shadow-soft)',
+                                            fontSize: '12px',
+                                            color: 'var(--color-text-main)'
                                         }}
                                     />
-                                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} iconType="circle" />
                                     <Line
-                                        type="monotone"
+                                        type="natural"
                                         dataKey="gpt"
-                                        stroke="#22c55e"
-                                        strokeWidth={2}
+                                        stroke="var(--color-primary)"
+                                        strokeWidth={3}
                                         name="GPT"
-                                        dot={{ fill: '#22c55e', r: 4 }}
+                                        dot={{ fill: 'var(--color-primary)', r: 4, strokeWidth: 0 }}
+                                        activeDot={{ r: 6, fill: 'var(--color-primary)' }}
                                     />
                                     <Line
-                                        type="monotone"
+                                        type="natural"
                                         dataKey="deepseek"
-                                        stroke="#2563eb"
-                                        strokeWidth={2}
+                                        stroke="var(--color-accent)"
+                                        strokeWidth={3}
                                         name="DeepSeek"
-                                        dot={{ fill: '#2563eb', r: 4 }}
+                                        dot={{ fill: 'var(--color-accent)', r: 4, strokeWidth: 0 }}
+                                        activeDot={{ r: 6, fill: 'var(--color-accent)' }}
                                     />
                                 </LineChart>
                             </ResponsiveContainer>
@@ -268,88 +287,88 @@ export default function DashboardPage() {
                 {/* Statistics Cards */}
                 <div className="space-y-6">
                     <Card>
-                    <CardContent className="pt-6">
-                        {isMonthlyPatientLoading ? (
-                            <div className="animate-pulse">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                            <div className="h-4 w-24 bg-clinical-gray-200 rounded" />
-                                            <div className="h-8 w-20 bg-clinical-gray-200 rounded mt-2" />
+                        <CardContent className="pt-6">
+                            {isMonthlyPatientLoading ? (
+                                <div className="animate-pulse">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="h-4 w-24 bg-sage-100 rounded" />
+                                            <div className="h-8 w-20 bg-sage-100 rounded mt-2" />
+                                        </div>
+                                        <div className="w-12 h-12 bg-sage-100 rounded-2xl" />
                                     </div>
-                                        <div className="w-12 h-12 bg-clinical-gray-200 rounded-lg" />
+                                    <div className="h-3 w-40 bg-sage-100 rounded mt-4" />
                                 </div>
-                                    <div className="h-3 w-40 bg-clinical-gray-200 rounded mt-4" />
-                            </div>
-                        ) : (
-                            <div className={`transition-opacity duration-700 ${monthlyPatientVisible ? 'opacity-100' : 'opacity-0'}`}>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                            <p className="text-sm text-clinical-gray-600">Pacientes</p>
-                                            <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyPatientResume.total}</p>
+                            ) : (
+                                <div className={`transition-opacity duration-700 ${monthlyPatientVisible ? 'opacity-100' : 'opacity-0'}`}>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-sage-500 font-medium">Pacientes</p>
+                                            <p className="text-3xl font-bold text-sage-900 mt-1">{monthlyPatientResume.total}</p>
+                                        </div>
+                                        <div className="w-12 h-12 bg-sage-100 rounded-2xl flex items-center justify-center shadow-sm">
+                                            <Users className="text-sage-600" size={24} />
+                                        </div>
                                     </div>
-                                        <div className="w-12 h-12 bg-clinical-blue-100 rounded-lg flex items-center justify-center">
-                                            <Users className="text-clinical-blue-600" size={24} />
-                                    </div>
+                                    {monthlyPatientResume.changePercent > 0 ? (
+                                        <div className="flex items-center gap-1 mt-4">
+                                            <TrendingUp size={16} className="text-clinical-green-600" />
+                                            <span className="text-sm text-clinical-green-600 font-medium">{monthlyPatientResume.changePercent}%</span>
+                                            <span className="text-sm text-sage-400 font-medium ml-1">vs mes anterior</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-1 mt-4">
+                                            <TrendingDown size={16} className="text-status-error" />
+                                            <span className="text-sm text-status-error font-medium">{monthlyPatientResume.changePercent}%</span>
+                                            <span className="text-sm text-sage-400 font-medium ml-1">vs mes anterior</span>
+                                        </div>
+                                    )}
                                 </div>
-                                {monthlyPatientResume.changePercent > 0 ? (
-                                    <div className="flex items-center gap-1 mt-4">
-                                        <TrendingUp size={16} className="text-clinical-green-600" />
-                                        <span className="text-sm text-clinical-green-600 font-medium">{monthlyPatientResume.changePercent}%</span>
-                                        <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-1 mt-4">
-                                            <TrendingDown size={16} className="text-clinical-red-600" />
-                                            <span className="text-sm text-clinical-red-600 font-medium">{monthlyPatientResume.changePercent}%</span>
-                                            <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                            )}
+                        </CardContent>
+                    </Card>
 
                     <Card>
-                    <CardContent className="pt-6">
-                        {isMonthlyInquiryLoading ? (
-                            <div className="animate-pulse">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                            <div className="h-4 w-28 bg-clinical-gray-200 rounded" />
-                                            <div className="h-8 w-24 bg-clinical-gray-200 rounded mt-2" />
+                        <CardContent className="pt-6">
+                            {isMonthlyInquiryLoading ? (
+                                <div className="animate-pulse">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="h-4 w-28 bg-sage-100 rounded" />
+                                            <div className="h-8 w-24 bg-sage-100 rounded mt-2" />
+                                        </div>
+                                        <div className="w-12 h-12 bg-sage-100 rounded-2xl" />
                                     </div>
-                                        <div className="w-12 h-12 bg-clinical-gray-200 rounded-lg" />
+                                    <div className="h-3 w-44 bg-sage-100 rounded mt-4" />
                                 </div>
-                                    <div className="h-3 w-44 bg-clinical-gray-200 rounded mt-4" />
-                            </div>
-                        ) : (
-                            <div className={`transition-opacity duration-700 ${monthlyInquiryVisible ? 'opacity-100' : 'opacity-0'}`}>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                            <p className="text-sm text-clinical-gray-600">Diagnósticos</p>
-                                            <p className="text-3xl font-bold text-clinical-gray-900 mt-1">{monthlyInquiryResume.total}</p>
+                            ) : (
+                                <div className={`transition-opacity duration-700 ${monthlyInquiryVisible ? 'opacity-100' : 'opacity-0'}`}>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm text-sage-500 font-medium">Diagnósticos</p>
+                                            <p className="text-3xl font-bold text-sage-900 mt-1">{monthlyInquiryResume.total}</p>
+                                        </div>
+                                        <div className="w-12 h-12 bg-terracotta-100 rounded-2xl flex items-center justify-center shadow-sm">
+                                            <FileText className="text-terracotta-600" size={24} />
+                                        </div>
                                     </div>
-                                        <div className="w-12 h-12 bg-clinical-green-100 rounded-lg flex items-center justify-center">
-                                            <FileText className="text-clinical-green-600" size={24} />
-                                    </div>
-                                </div>
-                                {monthlyInquiryResume.changePercent > 0 ? (
-                                    <div className="flex items-center gap-1 mt-4">
+                                    {monthlyInquiryResume.changePercent > 0 ? (
+                                        <div className="flex items-center gap-1 mt-4">
                                             <TrendingUp size={16} className="text-clinical-green-600" />
                                             <span className="text-sm text-clinical-green-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
-                                            <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-1 mt-4">
-                                            <TrendingDown size={16} className="text-clinical-red-600" />
-                                            <span className="text-sm text-clinical-red-600 font-medium">{monthlyInquiryResume.changePercent}%</span>
-                                            <span className="text-sm text-clinical-gray-500">vs mes anterior</span>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                                            <span className="text-sm text-sage-400 font-medium ml-1">vs mes anterior</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-1 mt-4">
+                                            <TrendingDown size={16} className="text-status-error" />
+                                            <span className="text-sm text-status-error font-medium">{monthlyInquiryResume.changePercent}%</span>
+                                            <span className="text-sm text-sage-400 font-medium ml-1">vs mes anterior</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>

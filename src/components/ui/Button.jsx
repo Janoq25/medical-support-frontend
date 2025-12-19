@@ -8,14 +8,15 @@ export default function Button({
     className = '',
     disabled = false
 }) {
-    const baseStyles = 'px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer';
+    const baseStyles = 'px-6 py-2.5 rounded-full font-medium transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-95';
 
     const variants = {
-        primary: 'bg-clinical-blue-600 text-white hover:bg-clinical-blue-700 focus:ring-clinical-blue-500 disabled:bg-clinical-gray-300 disabled:cursor-not-allowed',
-        outline: 'border-2 border-clinical-gray-300 text-clinical-gray-700 hover:bg-clinical-gray-50 focus:ring-clinical-gray-400 disabled:border-clinical-gray-200 disabled:text-clinical-gray-400 disabled:cursor-not-allowed',
-        ghost: 'text-clinical-gray-700 hover:bg-clinical-gray-100 focus:ring-clinical-gray-400',
-        danger: 'bg-clinical-red-600 text-white hover:bg-clinical-red-700 focus:ring-clinical-red-500',
-        success: 'bg-clinical-green-600 text-white hover:bg-clinical-green-700 focus:ring-clinical-green-500',
+        primary: 'bg-sage-500 text-white hover:bg-sage-700 focus:ring-sage-500 hover:shadow-md hover:shadow-sage-200/50',
+        secondary: 'bg-white text-sage-800 border border-sage-200 hover:bg-sage-50 focus:ring-sage-400',
+        outline: 'bg-transparent border-2 border-sage-300 text-sage-700 hover:bg-sage-50 focus:ring-sage-400',
+        ghost: 'bg-transparent text-sage-700 hover:bg-sage-100/50 focus:ring-sage-400',
+        danger: 'bg-status-error text-white hover:brightness-90 focus:ring-red-400',
+        success: 'bg-status-success text-white hover:brightness-90 focus:ring-green-400',
     };
 
     return (
@@ -23,7 +24,7 @@ export default function Button({
             type={type}
             onClick={onClick}
             disabled={disabled}
-            className={`${baseStyles} ${variants[variant]} ${className}`}
+            className={`${baseStyles} ${variants[variant] || variants.primary} ${className}`}
         >
             {children}
         </button>
