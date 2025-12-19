@@ -2,7 +2,7 @@
 
 import { emitToast } from "@/services/utils/toast";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/ai";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 const handleResponse = async (response) => {
   const contentType = response.headers.get("content-type");
@@ -27,7 +27,7 @@ const handleResponse = async (response) => {
 };
 
 export const fetchAIResponse = async (model = "", prompt = "") => {
-  const response = await fetch(`${API_BASE_URL}/AI-response`, {
+  const response = await fetch(`${API_BASE_URL}/ai/AI-response`, {
     method: "POST",
     cache: "no-store",
     headers: {
