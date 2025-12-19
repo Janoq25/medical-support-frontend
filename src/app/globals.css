@@ -2,119 +2,170 @@
 
 
 @theme {
-  --color-clinical-blue-50: #eff6ff;
-  --color-clinical-blue-100: #dbeafe;
-  --color-clinical-blue-200: #bfdbfe;
-  --color-clinical-blue-300: #93c5fd;
-  --color-clinical-blue-400: #60a5fa;
-  --color-clinical-blue-500: #3b82f6;
-  --color-clinical-blue-600: #2563eb;
-  --color-clinical-blue-700: #1d4ed8;
+  /* Brand Colors - Biophilic Palette */
+  /* Primary: Sage Green (#8A9A5B) */
+  --color-sage-50: #f4f7f2;
+  --color-sage-100: #e6ebe0;
+  --color-sage-200: #cfdac4;
+  --color-sage-300: #afc29f;
+  --color-sage-400: #8a9a5b;
+  /* Primary Brand */
+  --color-sage-500: #708047;
+  --color-sage-600: #586638;
+  --color-sage-700: #46502e;
+  --color-sage-800: #3a4128;
+  --color-sage-900: #313723;
 
-  --color-clinical-red-50: #fef2f2;
-  --color-clinical-red-100: #fee2e2;
-  --color-clinical-red-200: #fecaca;
-  --color-clinical-red-300: #fca5a5;
-  --color-clinical-red-400: #f87171;
-  --color-clinical-red-500: #ef4444;
-  --color-clinical-red-600: #dc2626;
-  --color-clinical-red-700: #b91c1c;
+  /* Secondary: Warm Terracotta (#E2B097) */
+  --color-terracotta-50: #fdf8f6;
+  --color-terracotta-100: #fcefe9;
+  --color-terracotta-200: #f8ded3;
+  --color-terracotta-300: #f2c5ad;
+  --color-terracotta-400: #e2b097;
+  /* Accent */
+  --color-terracotta-500: #d68f70;
+  --color-terracotta-600: #c26e53;
+  --color-terracotta-700: #a25642;
+  --color-terracotta-800: #88493b;
+  --color-terracotta-900: #703e33;
 
-  --color-clinical-green-50: #f0fdf4;
-  --color-clinical-green-100: #dcfce7;
-  --color-clinical-green-200: #bbf7d0;
-  --color-clinical-green-300: #86efac;
-  --color-clinical-green-400: #4ade80;
-  --color-clinical-green-500: #22c55e;
-  --color-clinical-green-600: #16a34a;
-  --color-clinical-green-700: #15803d;
+  /* Neutrals: Calming Beige/Sand */
+  --color-sand-50: #fafaf9;
+  /* Background Base */
+  --color-sand-100: #f5f5f4;
+  --color-sand-200: #e7e5e4;
+  --color-sand-300: #d6d3d1;
+  --color-sand-400: #a8a29e;
+  --color-sand-500: #78716c;
+  --color-sand-600: #57534e;
+  --color-sand-700: #44403c;
+  --color-sand-800: #292524;
+  --color-sand-900: #1c1917;
 
-  --color-clinical-gray-50: #f9fafb;
-  --color-clinical-gray-100: #f3f4f6;
-  --color-clinical-gray-200: #e5e7eb;
-  --color-clinical-gray-300: #d1d5db;
-  --color-clinical-gray-400: #9ca3af;
-  --color-clinical-gray-500: #6b7280;
-  --color-clinical-gray-600: #4b5563;
-  --color-clinical-gray-700: #374151;
-  --color-clinical-gray-800: #1f2937;
-  --color-clinical-gray-900: #111827;
+  /* Semantic Mappings */
+  --color-primary-light: var(--color-sage-100);
+  --color-primary: var(--color-sage-400);
+  --color-primary-dark: var(--color-sage-600);
 
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --color-accent-light: var(--color-terracotta-100);
+  --color-accent: var(--color-terracotta-400);
+  --color-accent-hover: var(--color-terracotta-500);
+
+  --color-background-soft: var(--color-sand-50);
+  --color-background-muted: var(--color-sand-100);
+
+  --color-text-main: var(--color-sand-900);
+  --color-text-muted: var(--color-sand-500);
+  --color-text-light: var(--color-sand-400);
+
+  /* Indicators - Restored from original Biophilic */
+  --color-status-error: #ef5350;
+  --color-status-success: #66bb6a;
+  --color-status-warning: #ffb74d;
+  --color-status-info: #5c6bc0;
+
+  /* Radius & Shadows */
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+  --shadow-soft: 0 4px 20px -2px rgba(138, 154, 91, 0.1);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+
+  /* Font */
+  --font-sans: var(--font-nunito), system-ui, sans-serif;
+  /* Transition Timing */
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @layer base {
-  * {
-    @apply border-clinical-gray-200;
+
+  *,
+  ::before,
+  ::after {
+    @apply border-sand-200;
   }
 
   body {
-    @apply bg-clinical-gray-50 text-clinical-gray-900 antialiased;
+    @apply bg-[var(--color-sand-200)] text-[var(--color-sand-900)] antialiased font-sans selection:bg-sage-200 selection:text-sage-900 transition-colors duration-300;
   }
-  [data-theme="dark"] body {
-    @apply bg-clinical-gray-50 text-clinical-gray-900;
+
+  /* Dark Mode Overrides */
+  /* Dark Mode Overrides - Deep Forest Theme */
+  [data-theme='dark'] {
+    /* Backgrounds: Deep Organic Dark */
+    --color-sand-50: #0c0e0c;
+    /* Very deep green-black base */
+    --color-sand-100: #151816;
+    /* Dark surface */
+    --color-sand-200: #252b26;
+    /* Borders/Separators */
+    --color-sand-300: #343a35;
+    /* Hover states */
+    --color-sand-400: #5c665e;
+    --color-sand-500: #859188;
+    /* Muted text */
+
+    /* Text */
+    --color-sand-700: #c5ccc7;
+    --color-sand-800: #e0e5e2;
+    --color-sand-900: #eceeec;
+    /* Primary text */
+
+    /* Sage adjustments for Dark Mode visibility */
+    --color-sage-50: #1a221b;
+    --color-sage-100: #232c25;
+    --color-sage-200: #354138;
+    --color-sage-300: #586638;
+    --color-sage-400: #708047;
+    --color-sage-500: #8a9a5b;
+    /* Original primary */
+    --color-sage-600: #afc29f;
+    --color-sage-700: #cfdac4;
+    /* Light sage for text */
+    --color-sage-800: #e6ebe0;
+    --color-sage-900: #f4f7f2;
+    /* Make sage text light in dark mode */
+
+    /* Terracotta adjustments */
+    --color-terracotta-100: #2d1e1a;
+    /* Darker terracotta background */
+    --color-terracotta-200: #4a342e;
+    --color-terracotta-600: #d68f70;
+    --color-terracotta-700: #f2c5ad;
+    /* Light terracotta for text */
+    --color-terracotta-800: #f8ded3;
+
+    /* Semantic Mappings Update */
+    --color-text-main: var(--color-sand-900);
+    --color-text-muted: var(--color-sand-500);
+    --color-background-soft: var(--color-sand-50);
+    --color-background-muted: var(--color-sand-100);
+
+    /* Brighten Primary/Accent for Dark Mode */
+    --color-primary: var(--color-sage-600);
+    /* Lighter Sage */
+    --color-accent: var(--color-terracotta-600);
+    /* Punchy Terracotta */
+    --color-accent-hover: var(--color-terracotta-700);
+
+    /* Shadow adjustments for dark mode */
+    --shadow-soft: 0 4px 24px -2px rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 2px 8px 0 rgba(0, 0, 0, 0.4);
+  }
+
+  [data-theme='dark'] .card-biophilic {
+    background-color: rgba(10, 12, 11, 0.8);
+    /* Much darker base */
+    border-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    --color-clinical-gray-50: #0b0f17;
-    --color-clinical-gray-100: #111827;
-    --color-clinical-gray-200: #1f2937;
-    --color-clinical-gray-300: #374151;
-    --color-clinical-gray-400: #6b7280;
-    --color-clinical-gray-500: #9ca3af;
-    --color-clinical-gray-600: #d1d5db;
-    --color-clinical-gray-700: #e5e7eb;
-    --color-clinical-gray-800: #f3f4f6;
-    --color-clinical-gray-900: #f9fafb;
-  }
+/* Biophilic Card Utility */
+@utility card-biophilic {
+  @apply bg-white/8 backdrop-blur-md rounded-3xl border border-white/50 shadow-soft;
 }
 
-:root[data-theme="dark"] {
-  --color-clinical-gray-50: #0b0f17;
-  --color-clinical-gray-100: #111827;
-  --color-clinical-gray-200: #1f2937;
-  --color-clinical-gray-300: #334155;
-  --color-clinical-gray-400: #475569;
-  --color-clinical-gray-500: #64748b;
-  --color-clinical-gray-600: #94a3b8;
-  --color-clinical-gray-700: #cbd5e1;
-  --color-clinical-gray-800: #e5e7eb;
-  --color-clinical-gray-900: #f8fafc;
-}
-
-[data-theme="dark"] .bg-white {
-  background-color: var(--color-clinical-gray-100);
-}
-[data-theme="dark"] .bg-clinical-gray-50 {
-  background-color: var(--color-clinical-gray-50);
-}
-[data-theme="dark"] .hover\:bg-clinical-gray-50:hover {
-  background-color: var(--color-clinical-gray-200);
-}
-[data-theme="dark"] .border-clinical-gray-200 {
-  border-color: var(--color-clinical-gray-300);
-}
-[data-theme="dark"] .text-clinical-gray-400 {
-  color: var(--color-clinical-gray-500);
-}
-[data-theme="dark"] .text-clinical-gray-500 {
-  color: var(--color-clinical-gray-600);
-}
-[data-theme="dark"] .text-clinical-gray-600 {
-  color: var(--color-clinical-gray-700);
-}
-[data-theme="dark"] .text-clinical-gray-900 {
-  color: var(--color-clinical-gray-800);
-}
-
-[data-theme="dark"] .bg-clinical-blue-50 {
-  background-color: rgba(37, 99, 235, 0.15);
-}
-[data-theme="dark"] .bg-clinical-green-50 {
-  background-color: rgba(34, 197, 94, 0.15);
-}
-[data-theme="dark"] .bg-clinical-red-50 {
-  background-color: rgba(239, 68, 68, 0.15);
+/* Soft Transition Utility */
+@utility transition-soft {
+  @apply transition-all duration-300 ease-soft;
 }
