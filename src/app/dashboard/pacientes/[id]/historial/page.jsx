@@ -95,7 +95,7 @@ export default function PatientHistoryPage({ params }) {
                     <div className="flex flex-col gap-6">
                         {/* 1. Avatar and Name */}
                         <div className="flex items-center gap-4">
-                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-clinical-blue-500 to-clinical-blue-700 flex items-center justify-center text-2xl md:text-3xl font-bold shadow-lg shrink-0">
+                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-linear-to-br from-clinical-blue-500 to-clinical-blue-700 flex items-center justify-center text-2xl md:text-3xl font-bold shadow-lg shrink-0">
                                 {`${patient.name?.charAt(0) || ''}${patient.lastname?.charAt(0) || ''}`.toUpperCase() || 'P'}
                             </div>
                             <h1 className="text-2xl md:text-3xl font-bold text-clinical-gray-900">{patient.name} {patient.lastname}</h1>
@@ -183,7 +183,7 @@ export default function PatientHistoryPage({ params }) {
                                         {/* Header: Icon, Date, Status, Button */}
                                         <div className="flex flex-wrap items-center justify-between gap-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-clinical-blue-100 flex items-center justify-center border-2 border-white shadow-sm">
+                                                <div className="w-10 h-10 rounded-full bg-clinical-blue-100 flex shrink-0 items-center justify-center border-2 border-white shadow-sm">
                                                     <span className="text-xs font-bold text-clinical-blue-700">
                                                         {consultation.type_diagnosis === 'deepseek'
                                                             ? 'DS'
