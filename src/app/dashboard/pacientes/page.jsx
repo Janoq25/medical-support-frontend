@@ -172,6 +172,9 @@ export default function PacientesPage() {
                     const fullName = `${patient.name} ${patient.lastname}`.trim();
                     const latestState = patient.latestInquiry?.patient_state || 'stable';
                     const diagnosis = patient.latestInquiry?.diagnosis || 'Sin diagnóstico';
+                    const truncatedDiagnosis = diagnosis.split(' ').length > 50 
+                        ? diagnosis.split(' ').slice(0, 50).join(' ') + '...' 
+                        : diagnosis;
 
                     const badgeVariant = latestState === 'critical'
                         ? 'critical'
@@ -197,7 +200,7 @@ export default function PacientesPage() {
                                     {/* Patient Info */}
                                     <div className="flex-1 w-full md:w-auto">
                                         <h3 className="font-semibold text-clinical-gray-900">{fullName || 'Paciente sin nombre'}</h3>
-                                        <p className="text-sm text-clinical-gray-600">{diagnosis}</p>
+                                        <p className="text-sm text-clinical-gray-600">{truncatedDiagnosis}</p>
                                         <p className="text-xs text-clinical-gray-500 mt-1">DNI: {patient.dni || 'No registrado'} • Tel: {patient.phone || 'Sin teléfono'}</p>
                                     </div>
 

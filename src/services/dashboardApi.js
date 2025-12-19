@@ -35,6 +35,7 @@ const findRecentPatients = async () => {
 export const getRecentPatients = async () => {
   const data = await findRecentPatients();
   const formatedData = data.map((dto) => ({
+    id: dto.patient.id,
     name: dto.patient.name,
     lastname: dto.patient.lastname,
     initials: getPatientInitials(dto.patient.name, dto.patient.lastname),
@@ -70,6 +71,19 @@ export const getInquiryMonthlyChart = async (
 ) => {
   const response = await fetch(
     `${API_BASE_URL}/dashboard/monthly-inquiry-chart?year=${year}`,
+    {
+      method: "GET",
+      cache: "no-store",
+    }
+  );
+  return handleResponse(response);
+};
+
+export const getAiMonthlyChart = async (
+  year = new Date().getFullYear()
+) => {
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/monthly-ai-chart?year=${year}`,
     {
       method: "GET",
       cache: "no-store",

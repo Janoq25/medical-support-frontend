@@ -675,7 +675,7 @@ export default function ConsultaPage({ params }) {
                       </CardTitle>
                     </div>
                     <span className="text-xs font-bold text-sage-600 bg-sage-100 px-3 py-1 rounded-full">
-                      {(aiResponses.gpt.confidence)} Confianza
+                      {(aiResponses.gpt.confidence)}% Confianza
                     </span>
                   </div>
                 </CardHeader>
@@ -742,7 +742,7 @@ export default function ConsultaPage({ params }) {
                       </CardTitle>
                     </div>
                     <span className="text-xs font-bold text-terracotta-700 bg-terracotta-100 px-3 py-1 rounded-full">
-                      {(aiResponses.deepseek.confidence)} Confianza
+                      {(aiResponses.deepseek.confidence)}% Confianza
                     </span>
                   </div>
                 </CardHeader>

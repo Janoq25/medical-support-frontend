@@ -1,14 +1,17 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import Card, { CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, Users, FileText } from 'lucide-react';
+import { TrendingUp, TrendingDown, Users, FileText, History, Activity } from 'lucide-react';
 import { diagnosticsChartData, aiAssistanceChartData } from '@/services/mockData';
-import { getRecentPatients, getPatientMonthlyResume, getInquiryMonthlyResume, getInquiryMonthlyChart } from '@/services/dashboardApi';
+import { getRecentPatients, getPatientMonthlyResume, getInquiryMonthlyResume, getInquiryMonthlyChart, getAiMonthlyChart } from '@/services/dashboardApi';
 import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
+    const router = useRouter();
+    const [openDropdownId, setOpenDropdownId] = useState(null);
     const [recentPatients, setRecentPatients] = useState([]);
     const [monthlyPatientResume, setMonthlyPatientResume] = useState({ total: 0, previous: 0, changePercent: 0 });
     const [monthlyInquiryResume, setMonthlyInquiryResume] = useState({ total: 0, previous: 0, changePercent: 0 });
@@ -23,6 +26,9 @@ export default function DashboardPage() {
     const [monthlyInquiryVisible, setMonthlyInquiryVisible] = useState(false);
     const currentYear = new Date().getFullYear();
     const [selectedYear, setSelectedYear] = useState(currentYear);
+    const [selectedAiYear, setSelectedAiYear] = useState(currentYear);
+    const [aiMonthlyChart, setAiMonthlyChart] = useState([]);
+    const [isAiChartLoading, setIsAiChartLoading] = useState(false);
     const years = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4];
 
     // Obtener toda la data para el dashboard (por sección)
@@ -69,6 +75,21 @@ export default function DashboardPage() {
         fetchChart();
         return () => { active = false };
     }, [selectedYear]);
+
+    useEffect(() => {
+        let active = true;
+        const fetchAiChart = async () => {
+            setIsAiChartLoading(true);
+            try {
+                const data = await getAiMonthlyChart(selectedAiYear);
+                if (active) setAiMonthlyChart(data);
+            } finally {
+                if (active) setIsAiChartLoading(false);
+            }
+        };
+        fetchAiChart();
+        return () => { active = false };
+    }, [selectedAiYear]);
 
     useEffect(() => {
         if (!isRecentLoading) {
@@ -204,7 +225,7 @@ export default function DashboardPage() {
                         ) : (
                             <div className={`space-y-4 transition-opacity duration-700 ${recentVisible ? 'opacity-100' : 'opacity-0'}`}>
                                 {recentPatients.map((patient, index) => (
-                                    <div key={index} className={`flex items-center gap-4 p-2 hover:bg-white/50 rounded-2xl transition-all duration-300 ease-out ${index < recentRevealCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
+                                    <a key={index} className={`flex items-center gap-4 p-2 hover:bg-white/50 rounded-2xl transition-all duration-300 ease-out ${index < recentRevealCount ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`} href={`pacientes/${patient.id}/historial`}>
                                         <div className="w-10 h-10 rounded-full bg-sage-100 flex items-center justify-center text-sage-700 font-bold text-sm shadow-sm">
                                             {patient.initials}
                                         </div>
@@ -227,7 +248,8 @@ export default function DashboardPage() {
                                                         ? 'En tratamiento'
                                                         : ''}
                                         </Badge>
-                                    </div>
+                                        
+                                    </a>
                                 ))}
                             </div>
                         )}
@@ -240,46 +262,63 @@ export default function DashboardPage() {
                 {/* AI Assistance Chart */}
                 <Card className="lg:col-span-2">
                     <CardHeader>
-                        <CardTitle>Asistencia por IA Exitosa</CardTitle>
+                        <div className="flex items-center justify-between gap-4">
+                            <CardTitle>Asistencia por IA Exitosa</CardTitle>
+                            <select
+                                value={selectedAiYear}
+                                onChange={(e) => setSelectedAiYear(Number(e.target.value))}
+                                className="px-4 py-2 border-none rounded-full text-sm text-sage-700 bg-sage-50 hover:bg-sage-100 cursor-pointer focus:ring-2 focus:ring-sage-200"
+                            >
+                                {years.map((y) => (
+                                    <option key={y} value={y}>{y}</option>
+                                ))}
+                            </select>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <div className="h-[250px] lg:h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={aiAssistanceChartData} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                    <XAxis dataKey="month" stroke="var(--color-primary)" fontSize={12} tickMargin={10} tickLine={false} axisLine={false} />
-                                    <YAxis stroke="var(--color-primary)" fontSize={12} tickLine={false} axisLine={false} />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: 'var(--color-background-muted)',
-                                            border: '1px solid var(--color-sand-200)',
-                                            borderRadius: '16px',
-                                            boxShadow: 'var(--shadow-soft)',
-                                            fontSize: '12px',
-                                            color: 'var(--color-text-main)'
-                                        }}
-                                    />
-                                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} iconType="circle" />
-                                    <Line
-                                        type="natural"
-                                        dataKey="gpt"
-                                        stroke="var(--color-primary)"
-                                        strokeWidth={3}
-                                        name="GPT"
-                                        dot={{ fill: 'var(--color-primary)', r: 4, strokeWidth: 0 }}
-                                        activeDot={{ r: 6, fill: 'var(--color-primary)' }}
-                                    />
-                                    <Line
-                                        type="natural"
-                                        dataKey="deepseek"
-                                        stroke="var(--color-accent)"
-                                        strokeWidth={3}
-                                        name="DeepSeek"
-                                        dot={{ fill: 'var(--color-accent)', r: 4, strokeWidth: 0 }}
-                                        activeDot={{ r: 6, fill: 'var(--color-accent)' }}
-                                    />
-                                </LineChart>
-                            </ResponsiveContainer>
+                            {isAiChartLoading ? (
+                                <div className="h-full w-full bg-white/50 rounded-3xl overflow-hidden p-4 animate-pulse">
+                                    <div className="h-full bg-sage-50 rounded-2xl" />
+                                </div>
+                            ) : (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={aiMonthlyChart} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                        <XAxis dataKey="month" stroke="var(--color-primary)" fontSize={12} tickMargin={10} tickLine={false} axisLine={false} />
+                                        <YAxis stroke="var(--color-primary)" fontSize={12} tickLine={false} axisLine={false} />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'var(--color-background-muted)',
+                                                border: '1px solid var(--color-sand-200)',
+                                                borderRadius: '16px',
+                                                boxShadow: 'var(--shadow-soft)',
+                                                fontSize: '12px',
+                                                color: 'var(--color-text-main)'
+                                            }}
+                                        />
+                                        <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} iconType="circle" />
+                                        <Line
+                                            type="natural"
+                                            dataKey="gpt"
+                                            stroke="var(--color-primary)"
+                                            strokeWidth={3}
+                                            name="GPT"
+                                            dot={{ fill: 'var(--color-primary)', r: 4, strokeWidth: 0 }}
+                                            activeDot={{ r: 6, fill: 'var(--color-primary)' }}
+                                        />
+                                        <Line
+                                            type="natural"
+                                            dataKey="deepseek"
+                                            stroke="var(--color-accent)"
+                                            strokeWidth={3}
+                                            name="DeepSeek"
+                                            dot={{ fill: 'var(--color-accent)', r: 4, strokeWidth: 0 }}
+                                            activeDot={{ r: 6, fill: 'var(--color-accent)' }}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

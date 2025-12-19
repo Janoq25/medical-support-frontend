@@ -92,35 +92,43 @@ export default function PatientHistoryPage({ params }) {
             {/* Patient Header Card */}
             <Card>
                 <CardContent className="p-4 md:p-6">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                        <div className="flex items-center gap-6">
-                            {/* Large Avatar */}
-                            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-clinical-blue-500 to-clinical-blue-700 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                    <div className="flex flex-col gap-6">
+                        {/* 1. Avatar and Name */}
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-clinical-blue-500 to-clinical-blue-700 flex items-center justify-center text-2xl md:text-3xl font-bold shadow-lg shrink-0">
                                 {`${patient.name?.charAt(0) || ''}${patient.lastname?.charAt(0) || ''}`.toUpperCase() || 'P'}
                             </div>
+                            <h1 className="text-2xl md:text-3xl font-bold text-clinical-gray-900">{patient.name} {patient.lastname}</h1>
+                        </div>
 
-                            {/* Patient Info */}
-                            <div className="space-y-3">
-                                <div>
-                                    <h1 className="text-3xl font-bold text-clinical-gray-900">{patient.name} {patient.lastname}</h1>
-                                    <p className="text-clinical-gray-600 mt-1">{latestInquiry?.diagnosis || 'Sin diagnóstico previo'}</p>
-                                </div>
+                        {/* 2. Diagnosis */}
+                        <div className="bg-clinical-gray-50 p-4 rounded-lg border border-clinical-gray-100">
+                            <h3 className="text-sm font-bold text-clinical-gray-700 mb-1 uppercase tracking-wide">Diagnóstico Reciente</h3>
+                            <p className="text-clinical-gray-800 text-lg leading-relaxed">
+                                {latestInquiry?.diagnosis || 'Sin diagnóstico previo'}
+                            </p>
+                        </div>
 
-                                <div className="flex items-center gap-3">
-                                    <Badge variant={badgeVariant}>{badgeLabel}</Badge>
-                                    <span className="text-sm text-clinical-gray-600">DNI: {patient.dni || 'No registrado'}</span>
-                                </div>
+                        {/* 3. Secondary Data */}
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-clinical-gray-600">
+                            <div className="flex items-center gap-2">
+                                <span className="font-semibold">Estado:</span>
+                                <Badge variant={badgeVariant}>{badgeLabel}</Badge>
+                            </div>
+                            <div className="w-px h-4 bg-clinical-gray-300 hidden sm:block"></div>
+                            <div>
+                                <span className="font-semibold">DNI:</span> {patient.dni || 'No registrado'}
                             </div>
                         </div>
 
-                        {/* Action Button */}
-                        <div className="w-full md:w-auto mt-4 md:mt-0">
+                        {/* 4. Button */}
+                        <div className="pt-2">
                             <Button
                                 variant="primary"
                                 onClick={() => router.push(`/dashboard/consulta/${id}`)}
-                                className="w-full md:w-auto px-6 py-3 shadow-lg hover:shadow-xl transition-shadow flex justify-center"
+                                className="w-full md:w-auto px-8 py-3 shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                             >
-                                <Activity size={20} className="mr-2" />
+                                <Activity size={20} />
                                 Iniciar Nueva Consulta
                             </Button>
                         </div>
@@ -129,7 +137,7 @@ export default function PatientHistoryPage({ params }) {
             </Card>
 
             {/* Charts Section (placeholder since no indicator history yet) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
                     <CardContent className="p-4 md:p-6">
                         <div className="flex items-center gap-2 mb-4">
@@ -153,7 +161,7 @@ export default function PatientHistoryPage({ params }) {
                         </div>
                     </CardContent>
                 </Card>
-            </div>
+            </div> */}
 
             {/* Consultation History Timeline */}
             <Card>
@@ -169,58 +177,63 @@ export default function PatientHistoryPage({ params }) {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {inquiries.map((consultation, index) => (
-                                <div key={consultation.id} className="relative">
-                                    {index !== inquiries.length - 1 && (
-                                        <div className="absolute left-6 top-12 bottom-0 w-0.5 bg-clinical-gray-200"></div>
-                                    )}
-
-                                    <div className="flex gap-4">
-                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-clinical-blue-100 flex items-center justify-center border-4 border-white shadow-md">
-                                            <span className="text-xs font-bold text-clinical-blue-700">
-                                                {consultation.type_diagnosis === 'deepseek'
-                                                    ? 'DS'
-                                                    : consultation.type_diagnosis === 'chatgpt'
-                                                        ? 'GPT'
-                                                        : 'MD'}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex-1 bg-clinical-gray-50 rounded-lg p-4 hover:bg-clinical-gray-100 transition-colors">
-                                            <div className="flex items-start justify-between">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-3 mb-2">
-                                                        <p className="text-sm font-semibold text-clinical-gray-900">
-                                                            {new Date(consultation.createdAt).toLocaleDateString('es-ES', {
-                                                                year: 'numeric',
-                                                                month: 'long',
-                                                                day: 'numeric'
-                                                            })}
-                                                        </p>
-                                                        <Badge variant={badgeVariant}>
-                                                            {consultation.patient_state === 'critical'
-                                                                ? 'Crítico'
-                                                                : consultation.patient_state === 'in_treatment'
-                                                                    ? 'En tratamiento'
-                                                                    : 'Estable'}
-                                                        </Badge>
-                                                    </div>
-                                                    <p className="text-clinical-gray-700 mb-2">{consultation.diagnosis}</p>
-                                                    {consultation.feedback && (
-                                                        <p className="text-sm text-clinical-gray-500">{consultation.feedback}</p>
-                                                    )}
+                            {inquiries.map((consultation) => (
+                                <div key={consultation.id} className="bg-clinical-gray-50 rounded-lg p-4 hover:bg-clinical-gray-100 transition-colors border border-clinical-gray-100">
+                                    <div className="flex flex-col gap-3">
+                                        {/* Header: Icon, Date, Status, Button */}
+                                        <div className="flex flex-wrap items-center justify-between gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-clinical-blue-100 flex items-center justify-center border-2 border-white shadow-sm">
+                                                    <span className="text-xs font-bold text-clinical-blue-700">
+                                                        {consultation.type_diagnosis === 'deepseek'
+                                                            ? 'DS'
+                                                            : consultation.type_diagnosis === 'chatgpt'
+                                                                ? 'GPT'
+                                                                : 'MD'}
+                                                    </span>
                                                 </div>
-
-                                                <div className="flex flex-col md:flex-row items-end md:items-center gap-2">
-                                                    <Button variant="outline" onClick={() => { }} className="hidden md:flex">
-                                                        Ver Detalles
-                                                    </Button>
-                                                    <Button variant="outline" onClick={() => { }} className="md:hidden p-2">
-                                                        <Eye size={20} />
-                                                    </Button>
-                                                </div>
+                                                <p className="text-sm font-bold text-clinical-gray-900">
+                                                    {new Date(consultation.createdAt).toLocaleDateString('es-ES', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    })}
+                                                </p>
+                                                <Badge variant={
+                                                    consultation.patient_state === 'critical' ? 'critical' :
+                                                        consultation.patient_state === 'in_treatment' ? 'warning' : 'stable'
+                                                }>
+                                                    {consultation.patient_state === 'critical'
+                                                        ? 'Crítico'
+                                                        : consultation.patient_state === 'in_treatment'
+                                                            ? 'En tratamiento'
+                                                            : 'Estable'}
+                                                </Badge>
                                             </div>
+
+                                            {/* <div className="flex items-center">
+                                                <Button variant="outline" onClick={() => { }} className="hidden md:flex text-xs h-8">
+                                                    Ver Detalles
+                                                </Button>
+                                                <Button variant="outline" onClick={() => { }} className="md:hidden p-2 h-8 w-8 flex items-center justify-center">
+                                                    <Eye size={16} />
+                                                </Button>
+                                            </div> */}
                                         </div>
+
+                                        {/* Diagnosis */}
+                                        <div className="rounded border border-clinical-gray-200">
+                                            <p className="text-sm leading-relaxed">
+                                                {consultation.diagnosis}
+                                            </p>
+                                        </div>
+
+                                        {/* Feedback */}
+                                        {consultation.feedback && (
+                                            <p className="text-xs text-clinical-gray-500 italic">
+                                                Nota: {consultation.feedback}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             ))}
