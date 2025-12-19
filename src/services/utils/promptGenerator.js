@@ -12,15 +12,15 @@ export function generateConsultationPrompt(patient, indicators, indicatorValues)
     prompt += `### DATOS DEL PACIENTE:\n`;
     prompt += `- Nombre: ${patient.name} ${patient.lastname}\n`;
     prompt += `- Edad: ${calculateAge(patient.birthdate)} años\n`;
-    prompt += `- Género: ${patient.gender || "No especificado"}\n`;
+    prompt += `- Género: ${patient.gender ? "Masculino" : "Femenino"}\n`;
 
     // 2. Indicators Analysis
     prompt += `### INDICADORES CLÍNICOS REGISTRADOS:\n`;
 
     const categories = {
-        fisico: "Indicadores Físicos",
-        psicologico: "Indicadores Psicológicos",
-        conductual: "Indicadores Conductuales",
+        Físico: "Indicadores Físicos",
+        Psicológico: "Indicadores Psicológicos",
+        Conductual: "Indicadores Conductuales",
     };
 
     for (const [type, label] of Object.entries(categories)) {
@@ -46,7 +46,12 @@ export function generateConsultationPrompt(patient, indicators, indicatorValues)
     prompt += `1. Analizar los datos proporcionados, desglosando los aspectos físicos, psicológicos y conductuales.\n`;
     prompt += `2. Basado en los criterios del DSM-5, indicar si este perfil sugiere la presencia de un TCA.\n`;
     prompt += `3. Si sugieres un TCA, especifica cuál o cuáles podrían ser los diagnósticos probables.\n`;
-    prompt += `4. Si el perfil es atípico o contradictorio, explica por qué.\n`;
+    prompt += `4. Si el perfil es atípico o contradictorio, explica por qué.\n\n`;
+    prompt += `### FORMATO DE RESPUESTA:\n`;
+    prompt += `- Utiliza ÚNICAMENTE texto plano, sin formato markdown, sin negritas, sin asteriscos.\n`;
+    prompt += `- NO uses tablas, listas con viñetas ni numeración especial.\n`;
+    prompt += `- Máximo 150 palabras.\n`;
+    prompt += `- Respuesta clara, directa y legible.\n`;
 
     return prompt;
 }

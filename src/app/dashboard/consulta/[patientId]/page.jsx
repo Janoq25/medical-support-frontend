@@ -74,6 +74,7 @@ export default function ConsultaPage({ params }) {
       try {
         setLoadingIndicators(true);
         const data = await getIndicators();
+        console.log("Fetched indicators:", data);
         setIndicators(data);
         // Initialize indicator values
         const initialValues = {};
@@ -92,6 +93,11 @@ export default function ConsultaPage({ params }) {
   }, []);
 
   const handleRequestAI = async () => {
+     if (physicalInputsDisabled) {
+       showFeedbackToast("Por favor, calcule y aplique los indicadores físicos primero.");
+       return;
+     }
+
     setLoadingAI(true);
     setAiResponses(null);
     setSelectedModel(null);
@@ -157,11 +163,11 @@ export default function ConsultaPage({ params }) {
     let applied = 0;
 
     const findByName = (substr) =>
-      indicators.find((ind) => ind.name.toLowerCase().includes(substr));
+      indicators.find((ind) => ind.name === substr);
     const bmiIndicator =
-      findByName("masa corporal") || indicators.find((ind) => ind.id === "1");
+      findByName("Índice de Masa Corporal (IMC)") || indicators.find((ind) => ind.id === "1");
     const variationIndicator =
-      findByName("variación de peso") ||
+      findByName("Variación peso") ||
       indicators.find((ind) => ind.id === "2");
 
     if (bmiIndicator && bmi !== null) {
@@ -384,7 +390,7 @@ export default function ConsultaPage({ params }) {
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       {indicators
-                        .filter((ind) => ind.type === "fisico")
+                        .filter((ind) => ind.type === "Físico")
                         .map((indicator) => (
                           <div
                             key={indicator.id}
@@ -431,7 +437,7 @@ export default function ConsultaPage({ params }) {
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       {indicators
-                        .filter((ind) => ind.type === "psicologico")
+                        .filter((ind) => ind.type === "Psicológico")
                         .map((indicator) => (
                           <div key={indicator.id}>
                             <label className="text-sm font-bold text-sage-700 mb-2 block">
@@ -473,7 +479,7 @@ export default function ConsultaPage({ params }) {
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       {indicators
-                        .filter((ind) => ind.type === "conductual")
+                        .filter((ind) => ind.type === "Conductual")
                         .map((indicator) => (
                           <div key={indicator.id}>
                             {indicator.inputType === "scale_0_10" ? (
@@ -533,8 +539,14 @@ export default function ConsultaPage({ params }) {
           <Button
             variant="primary"
             className="w-full py-5 text-lg flex items-center justify-center gap-2 shadow-lg shadow-sage-200/50 hover:scale-[1.02]"
-            onClick={handleRequestAI}
-            disabled={loadingAI}
+             onClick={() => {
+               if (physicalInputsDisabled) {
+                 showFeedbackToast("Por favor, calcule y aplique los indicadores físicos primero.");
+               } else {
+                 handleRequestAI();
+               }
+             }}
+             disabled={loadingAI || physicalInputsDisabled}
           >
             {loadingAI ? (
               <>
@@ -663,7 +675,7 @@ export default function ConsultaPage({ params }) {
                       </CardTitle>
                     </div>
                     <span className="text-xs font-bold text-sage-600 bg-sage-100 px-3 py-1 rounded-full">
-                      {(aiResponses.gpt.confidence * 100).toFixed(0)}% Confianza
+                      {(aiResponses.gpt.confidence)} Confianza
                     </span>
                   </div>
                 </CardHeader>
@@ -730,7 +742,7 @@ export default function ConsultaPage({ params }) {
                       </CardTitle>
                     </div>
                     <span className="text-xs font-bold text-terracotta-700 bg-terracotta-100 px-3 py-1 rounded-full">
-                      {(aiResponses.deepseek.confidence * 100).toFixed(0)}% Confianza
+                      {(aiResponses.deepseek.confidence)} Confianza
                     </span>
                   </div>
                 </CardHeader>
