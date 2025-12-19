@@ -77,7 +77,7 @@ export default function ConsultaPage({ params }) {
         // Initialize indicator values
         const initialValues = {};
         data.forEach((indicator) => {
-          initialValues[indicator.id] = indicator.minRegularValue || 0;
+          initialValues[indicator.id] = (parseFloat(((indicator.minRegularValue + indicator.maxRegularValue)/2).toFixed(2)) || 0);
         });
         setIndicatorValues(initialValues);
       } catch (err) {
@@ -387,7 +387,7 @@ export default function ConsultaPage({ params }) {
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       {indicators
-                        .filter((ind) => ind.type === "fisico")
+                        .filter((ind) => ind.type === "Físico")
                         .map((indicator) => (
                           <div
                             key={indicator.id}
@@ -434,7 +434,7 @@ export default function ConsultaPage({ params }) {
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       {indicators
-                        .filter((ind) => ind.type === "psicologico")
+                        .filter((ind) => ind.type === "Psicológico")
                         .map((indicator) => (
                           <div key={indicator.id}>
                             <label className="text-sm font-medium text-clinical-gray-700 mb-2 block">
@@ -476,7 +476,7 @@ export default function ConsultaPage({ params }) {
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       {indicators
-                        .filter((ind) => ind.type === "conductual")
+                        .filter((ind) => ind.type === "Conductual")
                         .map((indicator) => (
                           <div key={indicator.id}>
                             {indicator.inputType === "scale_0_10" ? (
