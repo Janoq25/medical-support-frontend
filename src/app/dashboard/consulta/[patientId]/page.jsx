@@ -167,7 +167,7 @@ export default function ConsultaPage({ params }) {
     const bmiIndicator =
       findByName("Índice de Masa Corporal (IMC)") || indicators.find((ind) => ind.id === "1");
     const variationIndicator =
-      findByName("Variación peso") ||
+      findByName("Variación de peso") ||
       indicators.find((ind) => ind.id === "2");
 
     if (bmiIndicator && bmi !== null) {
