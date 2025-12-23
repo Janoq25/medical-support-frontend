@@ -28,7 +28,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <div className="px-8 py-8 flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-sage-900 tracking-tight">
-                        Erwin&apos;s Hospital
+                        ErwinBalance
                     </h1>
                     <p className="text-sm text-sage-500 mt-1 font-medium">Sistema de Diagnóstico</p>
                 </div>

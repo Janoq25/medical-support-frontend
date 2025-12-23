@@ -18,7 +18,7 @@ const montserrat = Montserrat({
 })
 
 export const metadata = {
-    title: "Erwin's Hospital",
+    title: "ErwinBalance",
     description: 'Medical Support System',
 };
 

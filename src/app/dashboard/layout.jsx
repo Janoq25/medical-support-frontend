@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }) {
                     >
                         <Menu size={24} />
                     </button>
-                    <span className="font-bold text-lg text-sage-800">Erwin&apos;s Hospital</span>
+                    <span className="font-bold text-lg text-sage-800">ErwinBalance</span>
                     <div className="ml-auto relative">
                         <button
                             onClick={() => setIsThemeMenuOpen((v) => !v)}

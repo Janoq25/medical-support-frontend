@@ -26,8 +26,9 @@ export default function AuthLayout({ children }) {
                 <Activity className="w-8 h-8 text-white" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-clinical-gray-900 mb-2">
-              👨‍⚕️ Erwin&apos;s Hospital
+            <h1 className="text-3xl font-bold text-clinical-gray-900 mb-2 flex items-center justify-center gap-2">
+              <img src="/icons/main.webp" alt="Logo" className="w-10 h-10 object-contain" />
+              ErwinBalance
             </h1>
             <p className="text-clinical-gray-600">
               🥼 Portal de Diagnóstico Asistido
