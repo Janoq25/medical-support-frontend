@@ -1,10 +1,11 @@
 import React from 'react';
 
-export default function Card({ children, className = '', hover = false }) {
+export default function Card({ children, className = '', hover = false, ...props }) {
     return (
         <div
             className={`card-biophilic ${hover ? 'transition-soft hover:shadow-soft hover:-translate-y-1' : ''
                 } ${className}`}
+            {...props}
         >
             {children}
         </div>

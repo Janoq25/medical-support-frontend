@@ -1,16 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import Card, { CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, Users, FileText, History, Activity } from 'lucide-react';
-import { diagnosticsChartData, aiAssistanceChartData } from '@/services/mockData';
+import { TrendingUp, TrendingDown, Users, FileText } from 'lucide-react';
 import { getRecentPatients, getPatientMonthlyResume, getInquiryMonthlyResume, getInquiryMonthlyChart, getAiMonthlyChart } from '@/services/dashboardApi';
 import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
-    const router = useRouter();
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const [recentPatients, setRecentPatients] = useState([]);
     const [monthlyPatientResume, setMonthlyPatientResume] = useState({ total: 0, previous: 0, changePercent: 0 });

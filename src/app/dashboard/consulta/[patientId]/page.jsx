@@ -167,7 +167,7 @@ export default function ConsultaPage({ params }) {
     const bmiIndicator =
       findByName("Índice de Masa Corporal (IMC)") || indicators.find((ind) => ind.id === "1");
     const variationIndicator =
-      findByName("Variación de peso") ||
+      findByName("Variación peso") ||
       indicators.find((ind) => ind.id === "2");
 
     if (bmiIndicator && bmi !== null) {
@@ -659,6 +659,7 @@ export default function ConsultaPage({ params }) {
               {/* GPT Response - Sage/Green Theme */}
               <Card
                 hover
+                onClick={() => handleSelectDiagnosis("gpt", aiResponses.gpt.diagnosis)}
                 className={`group relative cursor-pointer transition-all duration-300 ${selectedModel === "gpt"
                   ? "ring-2 ring-sage-500 shadow-soft scale-[1.01]"
                   : "hover:scale-[1.01]"
@@ -685,9 +686,10 @@ export default function ConsultaPage({ params }) {
                   </p>
 
                   <button
-                    onClick={() =>
-                      setShowPrompt((prev) => ({ ...prev, gpt: !prev.gpt }))
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowPrompt((prev) => ({ ...prev, gpt: !prev.gpt }));
+                    }}
                     className="text-xs font-semibold text-sage-600 hover:text-sage-800 cursor-pointer underline decoration-sage-300 underline-offset-4"
                   >
                     {showPrompt.gpt ? "Ocultar" : "Ver"} prompt enviado
@@ -726,6 +728,12 @@ export default function ConsultaPage({ params }) {
               {/* DeepSeek Response - Terracotta Theme */}
               <Card
                 hover
+                onClick={() =>
+                  handleSelectDiagnosis(
+                    "deepseek",
+                    aiResponses.deepseek.diagnosis
+                  )
+                }
                 className={`group relative cursor-pointer transition-all duration-300 ${selectedModel === "deepseek"
                   ? "ring-2 ring-terracotta-400 shadow-soft scale-[1.01]"
                   : "hover:scale-[1.01]"
@@ -752,12 +760,13 @@ export default function ConsultaPage({ params }) {
                   </p>
 
                   <button
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setShowPrompt((prev) => ({
                         ...prev,
                         deepseek: !prev.deepseek,
-                      }))
-                    }
+                      }));
+                    }}
                     className="text-xs font-semibold text-terracotta-600 hover:text-terracotta-800 cursor-pointer underline decoration-terracotta-300 underline-offset-4"
                   >
                     {showPrompt.deepseek ? "Ocultar" : "Ver"} prompt enviado
