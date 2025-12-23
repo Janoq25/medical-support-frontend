@@ -52,3 +52,10 @@ export const register = async (username, email, password) => {
   });
   return handleResponse(response);
 };
+
+export const logout = async () => {
+  await fetch(`${API_BASE_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+};

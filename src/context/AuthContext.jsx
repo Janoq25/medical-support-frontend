@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { login as apiLogin } from '@/services/auth/localApi';
+import { login as apiLogin, logout as apiLogout } from '@/services/auth/localApi';
 import { startGoogleLogin, getMe } from '@/services/auth/googleApi';
 
 const AuthContext = createContext(undefined);
@@ -65,7 +65,12 @@ export function AuthProvider({ children }) {
     router.push("/dashboard/home");
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await apiLogout();
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
     setUser(null);
     localStorage.removeItem("user");
     clearCookie("accessToken");
